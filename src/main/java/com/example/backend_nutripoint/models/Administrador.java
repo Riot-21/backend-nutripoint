@@ -15,7 +15,7 @@ public class Administrador {
     private String nombres;
     private String apellidos;
     private String email;
-    private String contraseña;
+    private String password;
     private Integer dni;
     private Integer telefono;
     private String estado;

@@ -1,6 +1,11 @@
 package com.example.backend_nutripoint.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.List;
@@ -17,19 +22,42 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id_usuario;
 
+    @NotBlank
+    @Column(nullable = false)
     private String nombres;
+
+    @NotBlank
+    @Column(nullable = false)
     private String apellidos;
 
-    @Column(unique = true)
+    @NotBlank
+    @Email
+    @Column(unique = true, nullable = false)
     private String email;
-    private String contraseña;
+
+    @NotBlank
+    @Size(min = 8, max = 64)
+    @Pattern(
+        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,64}$",
+        message = "La contraseña debe tener al menos una mayúscula, una minúscula, un número y un carácter especial"
+    )
+    @Column(nullable = false)
+    private String password;
+
+    @NotBlank
+    @Size(min = 8, max = 8)
+    @Column(unique = true)
     private Integer dni;
+
+    @NotBlank
+    @Size(min = 9, max = 9)
+    @Column(nullable = false)
     private Integer telefono;
-    private String estado;
+
+    @NotNull
+    private Boolean estado;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Compra> compras;
 
-    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
-    private List<Token> tokens;
 }
