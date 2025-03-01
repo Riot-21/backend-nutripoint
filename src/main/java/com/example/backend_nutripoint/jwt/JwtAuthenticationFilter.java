@@ -25,19 +25,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
-        try{
+              
+        try {
             String bearerToken = request.getHeader(HEADER_AUTHORIZATION);
-            
-            if(bearerToken == null || !bearerToken.startsWith(PREFIX_TOKEN)){
+
+            if (bearerToken == null || !bearerToken.startsWith(PREFIX_TOKEN)) {
                 filterChain.doFilter(request, response);
-                    System.out.println("Token no presente o formato incorrecto");
-                    return;
+                System.out.println("Token no presente o formato incorrecto");
+                return;
             }
             String jwt = bearerToken.substring(7);
             Claims claims = jwtService.getTokenClaims(jwt);
             System.out.println(jwt);
-            if(claims == null){
+            if (claims == null) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
                 return;
             }
@@ -45,12 +45,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String email = claims.getSubject();
             var userDetails = userService.loadUserByUsername(email);
 
-            UsernamePasswordAuthenticationToken authentication =
-            new UsernamePasswordAuthenticationToken(userDetails, null, null);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
+                    null, null);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            
-        }catch(Exception ex){
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No se pudo autenticar al usuario: " + ex.getMessage());
+
+        } catch (Exception ex) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                    "No se pudo autenticar al usuario: " + ex.getMessage());
             return;
         }
 

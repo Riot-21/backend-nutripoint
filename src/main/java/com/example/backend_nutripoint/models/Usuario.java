@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -37,22 +36,18 @@ public class Usuario {
 
     @NotBlank
     @Size(min = 8, max = 64)
-    @Pattern(
-        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,64}$",
-        message = "La contraseña debe tener al menos una mayúscula, una minúscula, un número y un carácter especial"
-    )
     @Column(nullable = false)
     private String password;
 
     @NotBlank
-    @Size(min = 8, max = 8)
-    @Column(unique = true)
-    private Integer dni;
+    @Size(min = 8, max = 8, message = "El telefono debe tener 9 dígitos")
+    @Column(unique = true, nullable = false)
+    private String dni;
 
     @NotBlank
-    @Size(min = 9, max = 9)
+    @Size(min = 9, max = 9, message = "El telefono debe tener 9 dígitos")
     @Column(nullable = false)
-    private Integer telefono;
+    private String telefono;
 
     @NotNull
     private Boolean estado;

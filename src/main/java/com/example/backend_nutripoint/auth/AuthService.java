@@ -12,6 +12,7 @@ import com.example.backend_nutripoint.jwt.JwtService;
 import com.example.backend_nutripoint.models.Usuario;
 import com.example.backend_nutripoint.repositories.UsuarioRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -22,6 +23,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
+    @Transactional
     public AuthResponse login(LoginRequest request){
         authenticationManager
             .authenticate(new UsernamePasswordAuthenticationToken(
@@ -39,9 +41,22 @@ public class AuthService {
 
     }
 
-    // public AuthResponse register(RegisterRequest request){
-    //     // if(userRepository.exists(request.getEmail())){
-    //     //     throw new RuntimeException("User already exists")
-    //     // }
-    // }
+    @Transactional
+    public AuthResponse register(RegisterRequest request){
+        Usuario user = new Usuario();
+        user.setNombres(request.getNombres());
+        user.setApellidos(request.getApellidos());
+        user.setEmail(request.getEmail());
+        user.setDni(request.getDni());
+        user.setTelefono(request.getTelefono());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setEstado(true);
+
+        userRepository.save(user);
+
+        return AuthResponse.builder()
+                .token(jwtService.createJwtToken(user))
+                .userId(user.getId_usuario())
+                .build();
+    }
 }

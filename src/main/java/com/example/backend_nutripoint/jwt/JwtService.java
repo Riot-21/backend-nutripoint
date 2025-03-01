@@ -46,8 +46,8 @@ public class JwtService {
                         .parseSignedClaims(token)
                         .getPayload();
             Date expDate = claims.getExpiration();
-            Date curretnDate = new Date();
-            if(curretnDate.before(expDate)){
+            Date currentDate = new Date();
+            if(currentDate.before(expDate)){
                 return claims;
             }
         }catch(Exception ex){
