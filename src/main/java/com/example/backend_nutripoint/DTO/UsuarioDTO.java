@@ -1,9 +1,8 @@
-package com.example.backend_nutripoint.auth;
+package com.example.backend_nutripoint.DTO;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +15,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
+public class UsuarioDTO {
 
     @NotBlank
     @Column(nullable = false)
@@ -32,11 +31,6 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank
-    @Size(min = 8, max = 64)
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,64}$", message = "La contraseña debe tener al menos una mayúscula, una minúscula, un número y un carácter especial")
-    private String password;
-
-    @NotBlank
     @Size(min = 8, max = 8, message = "El numero de DNI debe tener 8 dígitos")
     @Column(unique = true, nullable = false)
     private String dni;
@@ -45,5 +39,4 @@ public class RegisterRequest {
     @Size(min = 9, max = 9, message = "El numero de telefono debe tener 9 digitos")
     @Column(nullable = false)
     private String telefono;
-
 }

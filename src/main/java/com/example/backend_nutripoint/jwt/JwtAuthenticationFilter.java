@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             String jwt = bearerToken.substring(7);
             Claims claims = jwtService.getTokenClaims(jwt);
-            System.out.println(jwt);
+            // System.out.println(jwt);
             if (claims == null) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
                 return;

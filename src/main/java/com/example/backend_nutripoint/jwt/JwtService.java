@@ -48,6 +48,7 @@ public class JwtService {
             Date expDate = claims.getExpiration();
             Date currentDate = new Date();
             if(currentDate.before(expDate)){
+                System.out.println("Token no expirado");
                 return claims;
             }
         }catch(Exception ex){
