@@ -26,6 +26,7 @@ public class UserService implements UserDetailsService{
         
         return User.withUsername(user.getEmail())
                 .password(user.getPassword())
+                .authorities("ROLE_"+user.getRole().name())
                 .build();
     }
 

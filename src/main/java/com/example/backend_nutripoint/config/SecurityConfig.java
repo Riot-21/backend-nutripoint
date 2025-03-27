@@ -22,6 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import com.example.backend_nutripoint.jwt.JwtAuthenticationFilter;
+import com.example.backend_nutripoint.models.Role;
 
 import lombok.RequiredArgsConstructor;
 
@@ -47,7 +48,9 @@ public class SecurityConfig {
 
         return http.authorizeHttpRequests(authz -> authz
                 .requestMatchers("/auth/login").permitAll()
+                .requestMatchers("/auth/login-admin").permitAll()
                 .requestMatchers("/auth/register").permitAll()
+                .requestMatchers("/auth/register-admin").hasRole("ADMIN")
                 .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())
                 .httpBasic(basic -> basic.disable())
