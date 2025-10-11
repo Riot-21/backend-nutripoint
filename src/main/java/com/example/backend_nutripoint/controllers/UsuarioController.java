@@ -30,7 +30,7 @@ public class UsuarioController {
 
     private final UsuarioService userService;
     private final UsuarioRepository usuarioRepository;
-
+    
     @GetMapping("/profile")
     public ResponseEntity<Usuario> verPerfil(Authentication auth) {
         Usuario usuario = usuarioRepository.findByEmail(auth.getName())
