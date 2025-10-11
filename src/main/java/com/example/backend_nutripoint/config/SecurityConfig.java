@@ -22,7 +22,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import com.example.backend_nutripoint.jwt.JwtAuthenticationFilter;
-import com.example.backend_nutripoint.models.Role;
 
 import lombok.RequiredArgsConstructor;
 
