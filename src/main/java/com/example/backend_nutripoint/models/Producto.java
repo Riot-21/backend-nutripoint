@@ -14,14 +14,27 @@ import java.util.List;
 public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_producto;
+    private Integer idProducto;
 
+    @Column(nullable = false, unique = true)
     private String nombre;
+
+    @Column(nullable = false)
     private String descripcion;
+
+    @Column(nullable = false)
     private Integer stock;
+
+    @Column(nullable = false)
     private String marca;
-    private Double preciounit;
-    private String mod_empleo;
+
+    @Column(nullable = false)
+    private Double precioUnit;
+
+    @Column(nullable = false)
+    private String modEmpleo;
+
+    @Column(nullable = false)
     private String advert;
 
     @ManyToMany

@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "img_prod")
@@ -12,9 +13,14 @@ public class ImgProd {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idImg;
-    private String imagen;
+
+    @Column(nullable = false, columnDefinition = "LONGBLOB")
+    private byte[] image;
+
+    @Column(nullable = false)
+    private String contentType;
 
     @ManyToOne
-    @JoinColumn(name = "id_producto")
+    @JoinColumn(name = "id_producto", nullable = false)
     private Producto producto;
 }

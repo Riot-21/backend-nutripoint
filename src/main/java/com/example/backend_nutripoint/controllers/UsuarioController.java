@@ -47,7 +47,7 @@ public class UsuarioController {
         Usuario user = usuarioRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
 
-        return ResponseEntity.ok(userService.updateUser(user.getId_usuario(), usuarioDTO));
+        return ResponseEntity.ok(userService.updateUser(user.getIdUsuario(), usuarioDTO));
     }
 
     private ResponseEntity<?> validation(BindingResult result) {

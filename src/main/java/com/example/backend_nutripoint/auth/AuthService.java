@@ -39,7 +39,7 @@ public class AuthService {
 
         return AuthResponse.builder()
                 .token(token)
-                .userId(user.getId_usuario())
+                .userId(user.getIdUsuario())
                 .build();
 
     }
@@ -65,7 +65,7 @@ public class AuthService {
 
         return AuthResponse.builder()
                 .token(jwtService.createJwtToken(user))
-                .userId(user.getId_usuario())
+                .userId(user.getIdUsuario())
                 .build();
     }
 

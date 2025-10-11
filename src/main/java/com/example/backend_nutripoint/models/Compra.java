@@ -15,7 +15,7 @@ import java.util.List;
 public class Compra {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_compra;
+    private Integer idCompra;
 
     private Date fecha;
     private Double total;

@@ -15,9 +15,12 @@ public class Categoria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_categoria;
+    private Integer idCategoria;
 
+    @Column(nullable = false, unique = true)
     private String categoria;
+
+    @Column(nullable = false)
     private String objetivo;
 
     @ManyToMany(mappedBy = "categorias")
