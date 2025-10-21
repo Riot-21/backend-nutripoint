@@ -1,5 +1,6 @@
 package com.example.backend_nutripoint.advices;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +15,11 @@ import com.example.backend_nutripoint.exceptions.NotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<Map<String, String>> handleIO(IOException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", ex.getMessage()));
+    }
 
     // Manejo de recursos no encontrados
     @ExceptionHandler(NotFoundException.class)
@@ -32,11 +38,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    // Manejo de errores de argumentos inválidos (ej: duplicados, formato incorrecto)
+    // Manejo de errores de argumentos inválidos (ej: duplicados, formato
+    // incorrecto)
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error xd: ", ex.getMessage()));
+                .body(Map.of("error ", ex.getMessage()));
     }
 
     // Manejo genérico para excepciones no controladas
