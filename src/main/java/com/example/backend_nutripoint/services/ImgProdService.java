@@ -139,12 +139,12 @@ public class ImgProdService {
         }
     }
 
-    private List<String> secureURLImages(List<ImgProd> imagenes){
-        return imagenes.stream()
-                .map(img -> baseUrl + img.getIdImg())
-                .toList();
-                // .collect(Collectors.toList());
-    }
+    // private List<String> secureURLImages(List<ImgProd> imagenes){
+    //     return imagenes.stream()
+    //             .map(img -> baseUrl + img.getIdImg())
+    //             .toList();
+    //             // .collect(Collectors.toList());
+    // }
         // Extrae el public_id de la URL de Cloudinary
     private String extractPublicId(String url) {
         // Ejemplo: https://res.cloudinary.com/demo/image/upload/v1234/productos/123/abcde.jpg

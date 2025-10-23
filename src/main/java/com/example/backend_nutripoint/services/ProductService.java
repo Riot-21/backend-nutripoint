@@ -4,7 +4,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+// import org.hibernate.query.Page;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.backend_nutripoint.DTO.CreateProductDTO;
@@ -25,6 +31,56 @@ public class ProductService {
 
     @Value("${app.image.base-url}")
     private String imageUrl;
+
+    public Page<ProductResponseDTO> searchProducts(
+            String query,
+            String marca,
+            Double precioMin,
+            Double precioMax,
+            int page,
+            int size,
+            String sortBy,
+            String direction) {
+        Specification<Producto> spec = Specification.unrestricted();
+
+        // 🔸 Filtro por nombre o descripción
+        if (query != null && !query.isBlank()) {
+            spec = spec.and((root, q, cb) -> cb.or(
+                    cb.like(cb.lower(root.get("nombre")), "%" + query.toLowerCase() + "%"),
+                    cb.like(cb.lower(root.get("descripcion")), "%" + query.toLowerCase() + "%")));
+        }
+
+        // 🔸 Filtro por marca
+        if (marca != null && !marca.isBlank()) {
+            spec = spec.and((root, q, cb) -> cb.equal(cb.lower(root.get("marca")), marca.toLowerCase()));
+        }
+
+        // 🔸 Filtro por rango de precios
+        if (precioMin != null) {
+            spec = spec.and((root, q, cb) -> cb.greaterThanOrEqualTo(root.get("precioUnit"), precioMin));
+        }
+
+        if (precioMax != null) {
+            spec = spec.and((root, q, cb) -> cb.lessThanOrEqualTo(root.get("precioUnit"), precioMax));
+        }
+
+        if (!"asc".equalsIgnoreCase(direction) && !"desc".equalsIgnoreCase(direction)) {
+            throw new IllegalArgumentException("La dirección de orden debe ser 'asc' o 'desc'.");
+        }
+
+        // 🔸 Paginación y orden dinámico
+        Sort sort = "desc".equalsIgnoreCase(direction)
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // 🔸 Ejecutar consulta
+        Page<Producto> productosPage = productoRepository.findAll(spec, pageable);
+
+        // 🔸 Mapear entidades a DTOs
+        return productosPage.map(product -> mapToDTO(product, getImageUrlsFromEntity(product)));
+    }
 
     @Transactional
     public ProductResponseDTO createProduct(CreateProductDTO dto) throws IOException {
@@ -52,13 +108,14 @@ public class ProductService {
 
     public List<ProductResponseDTO> getAllProductos() {
         List<Producto> productos = productoRepository.findAll();
-        return productos.stream().map(product -> mapToDTO(product, imagenesWithSecureUrl(product.getImagenes()))).toList();
+        return productos.stream().map(product -> mapToDTO(product, imagenesWithSecureUrl(product.getImagenes())))
+                .toList();
     }
 
     public ProductResponseDTO getProductoById(Integer id) {
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Producto no encontrado. ID: " + id));
-        return mapToDTO(producto, imagenesWithSecureUrl(producto.getImagenes()));
+        return mapToDTO(producto, getImageUrlsFromEntity(producto));
     }
 
     public void deleteProducto(Integer id) {
@@ -87,5 +144,14 @@ public class ProductService {
                 .advert(prod.getAdvert())
                 .imagenesUrls(imagenesUrls)
                 .build();
+    }
+
+    private List<String> getImageUrlsFromEntity(Producto product) {
+        if (product.getImagenes() == null || product.getImagenes().isEmpty()) {
+            return List.of();
+        }
+        return product.getImagenes().stream()
+                .map(ImgProd::getImageUrl)
+                .toList();
     }
 }

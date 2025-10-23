@@ -1,18 +1,20 @@
 package com.example.backend_nutripoint.controllers;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+// import java.util.HashMap;
+// import java.util.List;
+// import java.util.Map;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
+// import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.backend_nutripoint.DTO.CreateProductDTO;
@@ -32,12 +34,13 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<?> createProducto(
             @Valid @ModelAttribute CreateProductDTO dto
-            // , BindingResult result
-            ) throws IOException {
+    // , BindingResult result
+    ) throws IOException {
 
-                // ! NO SE NECESITA VALIDAR CON result.hasErrors(), PORQUE PARA ESO YA ESTA DEFINIDO UNA EXCEPCION PARA @VALID
+        // ! NO SE NECESITA VALIDAR CON result.hasErrors(), PORQUE PARA ESO YA ESTA
+        // DEFINIDO UNA EXCEPCION PARA @VALID
         // if (result.hasErrors()) {
-        //     return validation(result);
+        // return validation(result);
         // }
         if (dto.getImagenes() != null && dto.getImagenes().size() > 3) {
             throw new IllegalArgumentException("No se pueden subir más de 3 imágenes.");
@@ -47,9 +50,24 @@ public class ProductController {
 
     }
 
+    // @GetMapping
+    // public ResponseEntity<List<ProductResponseDTO>> getAllProductos() {
+    // return ResponseEntity.ok(productService.getAllProductos());
+    // }
+
     @GetMapping
-    public ResponseEntity<List<ProductResponseDTO>> getAllProductos() {
-        return ResponseEntity.ok(productService.getAllProductos());
+    public ResponseEntity<Page<ProductResponseDTO>> listarProductos(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String marca,
+            @RequestParam(required = false) Double precioMin,
+            @RequestParam(required = false) Double precioMax,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "nombre") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+        Page<ProductResponseDTO> result = productService.searchProducts(
+                query, marca, precioMin, precioMax, page, size, sortBy, direction);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
@@ -63,11 +81,11 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
-    private ResponseEntity<?> validation(BindingResult result) {
-        Map<String, String> errors = new HashMap<>();
-        result.getFieldErrors().forEach(err -> {
-            errors.put(err.getField(), "El campo " + err.getField() + " " + err.getDefaultMessage());
-        });
-        return ResponseEntity.badRequest().body(errors);
-    }
+    // private ResponseEntity<?> validation(BindingResult result) {
+    //     Map<String, String> errors = new HashMap<>();
+    //     result.getFieldErrors().forEach(err -> {
+    //         errors.put(err.getField(), "El campo " + err.getField() + " " + err.getDefaultMessage());
+    //     });
+    //     return ResponseEntity.badRequest().body(errors);
+    // }
 }
