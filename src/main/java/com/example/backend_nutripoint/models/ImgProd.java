@@ -14,8 +14,10 @@ public class ImgProd {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idImg;
 
-    @Column(nullable = false, columnDefinition = "LONGBLOB")
-    private byte[] image;
+    // @Column(nullable = false, columnDefinition = "LONGBLOB")
+    // private byte[] image;
+    @Column(nullable = false)
+    private String imageUrl;
 
     @Column(nullable = false)
     private String contentType;

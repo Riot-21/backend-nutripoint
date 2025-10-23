@@ -40,40 +40,29 @@ public class ImgProdController {
     public ResponseEntity<Object> uploadImage(
             @PathVariable Integer productoId,
             @RequestParam("file") List<MultipartFile> files) throws IOException {
+            
         if (files.size() > 3) {
             return ResponseEntity.badRequest().body("No se pueden subir más de 3 imágenes.");
         }
-        // try {
+        
             List<String> imageUrls = imgProdService.uploadImage(files, productoId);
 
-        // Subir las imágenes y obtener sus URLs
-        // for (MultipartFile file : files) {
-        //     String imageUrl = imgProdService.uploadImage(file, productoId);
-        //     imageUrls.add(imageUrl);
-        // }
-            // files.forEach(file -> imgProdService.uploadImage(file, productoId));
-            // String imageUrl = imgProdService.uploadImage(files, productoId);
             return ResponseEntity.ok(imageUrls); // Devolver la URL simulada
-        // } catch (IllegalArgumentException e) {
-        //     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage()); // Manejo de tipo de archivo no
-        //                                                                                // soportado
-        // } catch (RuntimeException e) {
-        //     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        // }
+        
     }
 
-    @GetMapping("/{idImg}")
-    public ResponseEntity<byte[]> getImage(@PathVariable Integer idImg) {
-        try {
-            byte[] imageData = imgProdService.getImageById(idImg);
-            String type = imgProdService.getType(idImg);
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(type)) // Ajusta según el tipo de imagen
-                    .body(imageData);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-    }
+    // @GetMapping("/{idImg}")
+    // public ResponseEntity<byte[]> getImage(@PathVariable Integer idImg) {
+    //     try {
+    //         byte[] imageData = imgProdService.getImageById(idImg);
+    //         String type = imgProdService.getType(idImg);
+    //         return ResponseEntity.ok()
+    //                 .contentType(MediaType.parseMediaType(type)) // Ajusta según el tipo de imagen
+    //                 .body(imageData);
+    //     } catch (RuntimeException e) {
+    //         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    //     }
+    // }
 
     @DeleteMapping("/{idImg}")
     public ResponseEntity<Void> deleteImage(@PathVariable Integer idImg) {
