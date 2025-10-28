@@ -1,8 +1,14 @@
 package com.example.backend_nutripoint.auth;
 
-import jakarta.persistence.Column;
+import java.util.List;
+
+import com.example.backend_nutripoint.models.Role;
+
+// import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -19,16 +25,16 @@ import lombok.Setter;
 public class RegisterRequest {
 
     @NotBlank
-    @Column(nullable = false)
+    // @Column(nullable = false)
     private String nombres;
 
     @NotBlank
-    @Column(nullable = false)
+    // @Column(nullable = false)
     private String apellidos;
 
     @NotBlank
     @Email
-    @Column(unique = true, nullable = false)
+    // @Column(unique = true, nullable = false)
     private String email;
 
     @NotBlank
@@ -38,12 +44,18 @@ public class RegisterRequest {
 
     @NotBlank
     @Size(min = 8, max = 8, message = "El numero de DNI debe tener 8 dígitos")
-    @Column(unique = true, nullable = false)
+    @Pattern(regexp = "\\d+", message = "El DNI solo debe contener números")
+    // @Column(unique = true, nullable = false)
     private String dni;
 
     @NotBlank
     @Size(min = 9, max = 9, message = "El numero de telefono debe tener 9 digitos")
-    @Column(nullable = false)
+    @Pattern(regexp = "\\d+", message = "El DNI solo debe contener números")
+    // @Column(nullable = false)
     private String telefono;
+
+    @NotNull(message = "Debe especificar al menos un rol")
+    @NotEmpty(message = "La lista de roles no puede estar vacía")
+    private List<Role> roles;
 
 }

@@ -1,5 +1,10 @@
 package com.example.backend_nutripoint.jwt;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements UserDetailsService{
+public class UserService implements UserDetailsService {
 
     private final UsuarioRepository usuarioRepository;
 
@@ -22,11 +27,15 @@ public class UserService implements UserDetailsService{
     @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Usuario user = usuarioRepository.findByEmail(email)
-        .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-        
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        List<GrantedAuthority> authorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+                .collect(Collectors.toList());
+
         return User.withUsername(user.getEmail())
                 .password(user.getPassword())
-                .authorities("ROLE_"+user.getRole().name())
+                .authorities(authorities)
                 .build();
     }
 

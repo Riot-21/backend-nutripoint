@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 // import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.backend_nutripoint.DTO.CreateProductDTO;
+import com.example.backend_nutripoint.DTO.ProductFilterDTO;
 import com.example.backend_nutripoint.DTO.ProductResponseDTO;
+import org.springframework.security.core.Authentication;
 import com.example.backend_nutripoint.services.ProductService;
 
 import jakarta.validation.Valid;
@@ -31,7 +34,14 @@ public class ProductController {
 
     private final ProductService productService;
 
+    @GetMapping("/otro")
+    // @PreAuthorize("hasRole('ADMIN')")
+    public String hola() {
+        return "hola";
+    }
+
     @PostMapping
+    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createProducto(
             @Valid @ModelAttribute CreateProductDTO dto
     // , BindingResult result
@@ -56,19 +66,27 @@ public class ProductController {
     // }
 
     @GetMapping
+    // @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Page<ProductResponseDTO>> listarProductos(
-            @RequestParam(required = false) String query,
-            @RequestParam(required = false) String marca,
-            @RequestParam(required = false) Double precioMin,
-            @RequestParam(required = false) Double precioMax,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "nombre") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction) {
-        Page<ProductResponseDTO> result = productService.searchProducts(
-                query, marca, precioMin, precioMax, page, size, sortBy, direction);
+            @Valid @ModelAttribute ProductFilterDTO filterDTO) {
+        Page<ProductResponseDTO> result = productService.searchProducts(filterDTO);
         return ResponseEntity.ok(result);
     }
+
+    // @GetMapping
+    // public ResponseEntity<Page<ProductResponseDTO>> listarProductos(
+    // @RequestParam(required = false) String query,
+    // @RequestParam(required = false) String marca,
+    // @RequestParam(required = false) Double precioMin,
+    // @RequestParam(required = false) Double precioMax,
+    // @RequestParam(defaultValue = "0") int page,
+    // @RequestParam(defaultValue = "10") int size,
+    // @RequestParam(defaultValue = "nombre") String sortBy,
+    // @RequestParam(defaultValue = "asc") String direction) {
+    // Page<ProductResponseDTO> result = productService.searchProducts(
+    // query, marca, precioMin, precioMax, page, size, sortBy, direction);
+    // return ResponseEntity.ok(result);
+    // }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> getProductoById(@PathVariable Integer id) {
@@ -82,10 +100,11 @@ public class ProductController {
     }
 
     // private ResponseEntity<?> validation(BindingResult result) {
-    //     Map<String, String> errors = new HashMap<>();
-    //     result.getFieldErrors().forEach(err -> {
-    //         errors.put(err.getField(), "El campo " + err.getField() + " " + err.getDefaultMessage());
-    //     });
-    //     return ResponseEntity.badRequest().body(errors);
+    // Map<String, String> errors = new HashMap<>();
+    // result.getFieldErrors().forEach(err -> {
+    // errors.put(err.getField(), "El campo " + err.getField() + " " +
+    // err.getDefaultMessage());
+    // });
+    // return ResponseEntity.badRequest().body(errors);
     // }
 }

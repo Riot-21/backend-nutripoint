@@ -1,6 +1,5 @@
 package com.example.backend_nutripoint.controllers;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -28,40 +27,42 @@ public class ImgProdController {
 
     @GetMapping("/all/{idProducto}")
     public ResponseEntity<Object> getImagesByProduct(@PathVariable Integer idProducto) {
-        try {
-            List<String> imageUrls = imgProdService.getImagesByProductId(idProducto);
-            return ResponseEntity.ok(imageUrls);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        // try {
+        List<String> imageUrls = imgProdService.getImagesByProductId(idProducto);
+        return ResponseEntity.ok(imageUrls);
+        // } catch (RuntimeException e) {
+        // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        // }
     }
 
     @PostMapping("/upload/{productoId}")
     public ResponseEntity<Object> uploadImage(
             @PathVariable Integer productoId,
-            @RequestParam("file") List<MultipartFile> files) throws IOException {
-            
-        if (files.size() > 3) {
-            return ResponseEntity.badRequest().body("No se pueden subir más de 3 imágenes.");
-        }
-        
-            List<String> imageUrls = imgProdService.uploadImage(files, productoId);
+            @RequestParam("file") List<MultipartFile> files) {
 
-            return ResponseEntity.ok(imageUrls); // Devolver la URL simulada
-        
+        if (files.size() > 3) {
+            throw new IllegalArgumentException("No se pueden subir más de 3 imágenes.");
+
+        }
+
+        List<String> imageUrls = imgProdService.uploadImage(files, productoId);
+
+        return ResponseEntity.ok(imageUrls); 
+
     }
 
     // @GetMapping("/{idImg}")
     // public ResponseEntity<byte[]> getImage(@PathVariable Integer idImg) {
-    //     try {
-    //         byte[] imageData = imgProdService.getImageById(idImg);
-    //         String type = imgProdService.getType(idImg);
-    //         return ResponseEntity.ok()
-    //                 .contentType(MediaType.parseMediaType(type)) // Ajusta según el tipo de imagen
-    //                 .body(imageData);
-    //     } catch (RuntimeException e) {
-    //         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-    //     }
+    // try {
+    // byte[] imageData = imgProdService.getImageById(idImg);
+    // String type = imgProdService.getType(idImg);
+    // return ResponseEntity.ok()
+    // .contentType(MediaType.parseMediaType(type)) // Ajusta según el tipo de
+    // imagen
+    // .body(imageData);
+    // } catch (RuntimeException e) {
+    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    // }
     // }
 
     @DeleteMapping("/{idImg}")

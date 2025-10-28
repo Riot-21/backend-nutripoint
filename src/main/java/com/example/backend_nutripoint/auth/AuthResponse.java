@@ -1,5 +1,7 @@
 package com.example.backend_nutripoint.auth;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponse {
-    String token;
-    Integer userId;
+    private String token;
+    private Integer userId;
+    private List<String> roles;
 }

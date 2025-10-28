@@ -3,12 +3,16 @@ package com.example.backend_nutripoint.jwt;
 import static com.example.backend_nutripoint.config.TokenJwtConfig.*;
 import java.io.IOException;
 
+import org.springframework.lang.NonNull;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,24 +27,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserService userService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-
-        String path = request.getServletPath();
-        if (path.startsWith("/productos") || path.startsWith("/imagenes")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
 
         try {
             String bearerToken = request.getHeader(HEADER_AUTHORIZATION);
 
             if (bearerToken == null || !bearerToken.startsWith(PREFIX_TOKEN)) {
                 filterChain.doFilter(request, response);
-                System.out.println("Token no presente o formato incorrecto");
+                // System.out.println("Token no presente o formato incorrecto");
                 return;
             }
-            String jwt = bearerToken.substring(7);
+            String jwt = bearerToken.substring(7); // PREFIX_TOKEN.length()
             Claims claims = jwtService.getTokenClaims(jwt);
             // System.out.println(jwt);
             if (claims == null) {
@@ -55,10 +56,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        } catch (Exception ex) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                    "No se pudo autenticar al usuario: " + ex.getMessage());
-            return;
+        } catch (JwtException ex) {
+            SecurityContextHolder.clearContext();
+            throw new BadCredentialsException("Token inválido o expirado", ex);
         }
 
         filterChain.doFilter(request, response);
