@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.backend_nutripoint.models.Usuario;
 
-import java.security.Key;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -38,68 +37,39 @@ public class JwtService {
                 .compact();
     }
 
-    // public Claims getTokenClaims(String token) {
-    //     byte[] ketBytes = Decoders.BASE64.decode(secretKey);
-    //     var key = Keys.hmacShaKeyFor(ketBytes);
-    //     // var key = getSigningKey();
-    //     try {
-    //         var claims = Jwts
-    //                 .parser()
-    //                 .verifyWith(key)
-    //                 .build()
-    //                 .parseSignedClaims(token)
-    //                 .getPayload();
-
-    //         if (claims.getExpiration().before(new Date())) {
-    //             throw new JwtException("El token ha expirado");
-    //         }
-
-    //         return claims;
-    //     } catch (JwtException ex) {
-    //         throw new JwtException("Token invalido o expirado: " + ex.getMessage(), ex);
-    //     } catch (Exception e) {
-    //         throw new RuntimeException("Error al procesar el token JWT: " + e.getMessage(), e);
-    //     }
-
-    // }
 
     public Claims getTokenClaims(String token) {
-    try {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        var key = Keys.hmacShaKeyFor(keyBytes);
+        try {
+            byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+            var key = Keys.hmacShaKeyFor(keyBytes);
 
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+            return Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
 
-    } catch (io.jsonwebtoken.security.SignatureException e) {
-        // Firma inválida
-        throw new JwtException("Firma JWT no válida");
-    } catch (io.jsonwebtoken.ExpiredJwtException e) {
-        // Token expirado
-        throw new JwtException("El token ha expirado");
-    } catch (JwtException e) {
-        // Cualquier otro error JWT
-        throw new JwtException("Token inválido: " + e.getMessage());
-    } catch (Exception e) {
-        throw new RuntimeException("Error al procesar el token: " + e.getMessage());
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            
+            throw new JwtException("El token ha expirado");
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            
+            throw new JwtException("Firma JWT no válida");
+        } catch (JwtException e) {
+            // Cualquier otro error JWT
+            throw new JwtException("Token inválido: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("Error al procesar el token: " + e.getMessage());
+        }
     }
-}
 
-//   public static boolean validateToken(String token) {
-//     try {
-//       Jwts.parserBuilder().getSigningKey(key).build().parseClaimsJws(token);
-//       return true;
-//     } catch (Exception e) {
-//       return false;
-//     }
-//   }
-
-    // private Keys getSigningKey() {
-    //     byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-    //     return Keys.hmacShaKeyFor(keyBytes);
+    // public static boolean validateToken(String token) {
+    // try {
+    // Jwts.parserBuilder().getSigningKey(key).build().parseClaimsJws(token);
+    // return true;
+    // } catch (Exception e) {
+    // return false;
+    // }
     // }
 
 }

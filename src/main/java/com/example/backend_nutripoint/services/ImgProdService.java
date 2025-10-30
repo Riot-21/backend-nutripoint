@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +19,6 @@ import com.example.backend_nutripoint.models.Producto;
 import com.example.backend_nutripoint.repositories.ImgProdRepository;
 import com.example.backend_nutripoint.repositories.ProductoRepository;
 
-// import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -36,53 +34,55 @@ public class ImgProdService {
 
     private static final long MAX_SIZE_IN_BYTES = 2 * 1024 * 1024;
 
-    @Value("${app.image.base-url}")
-    private String baseUrl;
-
     @Transactional
     public List<String> uploadImage(List<MultipartFile> files, Integer productoId) {
         Producto producto = productoRepository.findById(productoId)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                .orElseThrow(() -> new NotFoundException("Producto no encontrado"));
 
         List<ImgProd> imagenesActuales = imgProdRepository.findByProductoIdProducto(productoId);
         if (imagenesActuales.size() + files.size() > 3) {
-            throw new IllegalArgumentException("Solo puede haber un maximo de 3 imagenes por producto");
+            throw new IllegalArgumentException("El producto ya tiene " + imagenesActuales.size() +
+                    " imágenes. Solo se permiten 3 en total.");
         }
 
         List<ImgProd> imagenes = new ArrayList<>();
+        // Public ID's para rollback en caso de fallo
+        List<String> uploadedPublicIds = new ArrayList<>();
 
         for (MultipartFile file : files) {
             validateImage(file);
 
-            try{
+            try {
 
-                
                 // definir el tipo de map como Map<String, Object>
-                Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
-                    "folder", "productos/" + productoId,
-                    "resource_type", "image"));
-                    String imageUrl = uploadResult.get("secure_url").toString();
-                    
-                    // Convertir archivo a bytes
-                    // byte[] imageData = file.getBytes();
-                    
-                    // Guardar en la BD
-                    ImgProd imgProd = new ImgProd();
-                    // imgProd.setImage(imageData);
-                    imgProd.setImageUrl(imageUrl);
-                    imgProd.setContentType(file.getContentType());
-                    imgProd.setProducto(producto);
-                    
-                    imagenes.add(imgProd);
-                }catch(IOException e){
-                    throw new ImageUploadException("Error al subir la imagen: "+ file.getOriginalFilename(), e);
+                @SuppressWarnings("unchecked")
+                Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
+                        "folder", "productos/" + productoId,
+                        "resource_type", "image"));
+                uploadedPublicIds.add((String) uploadResult.get("public_id"));
+                String imageUrl = uploadResult.get("secure_url").toString();
+
+                ImgProd imgProd = new ImgProd();
+                imgProd.setImageUrl(imageUrl);
+                imgProd.setContentType(file.getContentType());
+                imgProd.setProducto(producto);
+
+                imagenes.add(imgProd);
+            } catch (IOException e) {
+                for (String publicId : uploadedPublicIds) {
+                    try {
+                        cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+
+                    } catch (Exception ex) {
+                        throw new RuntimeException("Error eliminando imagen de Cloudinary: " + ex.getMessage());
+                    }
                 }
+                throw new ImageUploadException("Error al subir la imagen: " + file.getOriginalFilename(), e);
+            }
         }
 
         imgProdRepository.saveAll(imagenes);
-        // Devolver URL simulada
         return imagenes.stream().map(ImgProd::getImageUrl).toList();
-        // return secureURLImages(imagenes);
     }
 
     public List<String> getImagesByProductId(Integer idProducto) {
@@ -92,19 +92,6 @@ public class ImgProdService {
         }
         return imagenes.stream().map(ImgProd::getImageUrl).toList();
     }
-
-    // Metodo para imagenes en blob
-    // public byte[] getImageById(Integer idImg) {
-    // ImgProd imgProd = imgProdRepository.findById(idImg)
-    // .orElseThrow(() -> new RuntimeException("Imagen no encontrada"));
-    // return imgProd.getImage();
-    // }
-
-    // public String getType(Integer idImg) {
-    //     ImgProd imgProd = imgProdRepository.findById(idImg)
-    //             .orElseThrow(() -> new RuntimeException("Imagen no encontrada"));
-    //     return imgProd.getContentType();
-    // }
 
     @Transactional
     public void deleteImage(Integer idImg) {
@@ -122,22 +109,6 @@ public class ImgProdService {
         imgProdRepository.deleteById(idImg);
     }
 
-    // public void deleteImage(Integer idImg) {
-    // imgProdRepository.deleteById(idImg);
-    // }
-
-    // public List<String> getImagesByProductId(Integer idProducto) {
-    // List<ImgProd> imagenes =
-    // imgProdRepository.findByProductoIdProducto(idProducto);
-
-    // if (imagenes.isEmpty()) {
-    // throw new RuntimeException("No se encontraron imágenes para este producto.");
-    // }
-
-    // // Convertir la lista de imágenes en URLs
-    // return secureURLImages(imagenes);
-    // // .toList(); CREO QUE PUEDE PONERSE SIMPLEMENTE ASI
-    // }
 
     private void validateImage(MultipartFile file) {
         String mimeType = file.getContentType();
@@ -149,12 +120,6 @@ public class ImgProdService {
         }
     }
 
-    // private List<String> secureURLImages(List<ImgProd> imagenes){
-    // return imagenes.stream()
-    // .map(img -> baseUrl + img.getIdImg())
-    // .toList();
-    // // .collect(Collectors.toList());
-    // }
     // Extrae el public_id de la URL de Cloudinary
     private String extractPublicId(String url) {
         // Ejemplo:

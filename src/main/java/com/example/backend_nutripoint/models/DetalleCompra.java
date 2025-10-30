@@ -9,14 +9,14 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+// @AllArgsConstructor
 public class DetalleCompra {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idDetalle;
 
-    private Integer item;
-    private Integer cantidad;
+    private int item;
+    private int cantidad;
     private Double preciouni;
     private Double subtotal;
 

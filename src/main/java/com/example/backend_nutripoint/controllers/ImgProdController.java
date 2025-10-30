@@ -27,12 +27,8 @@ public class ImgProdController {
 
     @GetMapping("/all/{idProducto}")
     public ResponseEntity<Object> getImagesByProduct(@PathVariable Integer idProducto) {
-        // try {
         List<String> imageUrls = imgProdService.getImagesByProductId(idProducto);
         return ResponseEntity.ok(imageUrls);
-        // } catch (RuntimeException e) {
-        // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        // }
     }
 
     @PostMapping("/upload/{productoId}")
@@ -42,36 +38,20 @@ public class ImgProdController {
 
         if (files.size() > 3) {
             throw new IllegalArgumentException("No se pueden subir más de 3 imágenes.");
-
         }
 
         List<String> imageUrls = imgProdService.uploadImage(files, productoId);
-
         return ResponseEntity.ok(imageUrls); 
 
     }
-
-    // @GetMapping("/{idImg}")
-    // public ResponseEntity<byte[]> getImage(@PathVariable Integer idImg) {
-    // try {
-    // byte[] imageData = imgProdService.getImageById(idImg);
-    // String type = imgProdService.getType(idImg);
-    // return ResponseEntity.ok()
-    // .contentType(MediaType.parseMediaType(type)) // Ajusta según el tipo de
-    // imagen
-    // .body(imageData);
-    // } catch (RuntimeException e) {
-    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-    // }
-    // }
 
     @DeleteMapping("/{idImg}")
     public ResponseEntity<Void> deleteImage(@PathVariable Integer idImg) {
         try {
             imgProdService.deleteImage(idImg);
-            return ResponseEntity.noContent().build(); // Respuesta exitosa
+            return ResponseEntity.noContent().build(); 
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Imagen no encontrada
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); 
         }
     }
 }

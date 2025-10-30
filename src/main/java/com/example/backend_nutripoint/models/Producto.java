@@ -1,17 +1,32 @@
 package com.example.backend_nutripoint.models;
 
-import jakarta.persistence.*;
-import lombok.*;
-
+import java.math.BigDecimal;
 import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "productos")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+// @AllArgsConstructor
 public class Producto {
+    //!DIFERENCIA ENTRE INTGER E INT: INTEGER ES MEJOR PARA ID PORQUE ES NECESARIO QUE PERMITA NULL ANTES DE SER CREADO EN BD
+    //!INT DEFINE SIEMPRE CON 0, POR LO QUE SIEMPRE OBLIGA A QUE HAYA UN VALOR
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idProducto;
@@ -28,8 +43,9 @@ public class Producto {
     @Column(nullable = false)
     private String marca;
 
-    @Column(nullable = false)
-    private Double precioUnit;
+    @Column(nullable = false, precision = 10, scale = 2)
+    // private Double precioUnit;
+    private BigDecimal precioUnit;
 
     @Column(nullable = false)
     private String modEmpleo;

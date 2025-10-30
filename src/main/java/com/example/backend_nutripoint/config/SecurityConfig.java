@@ -19,9 +19,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-// import org.springframework.web.filter.CorsFilter;
 
 import com.example.backend_nutripoint.jwt.JwtAuthenticationFilter;
+
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -35,20 +35,21 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationConfiguration authenticationconfiguration;
 
+
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authenticationconfiguration.getAuthenticationManager();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 🔹 Manejador para 401 (no autenticado)
+    //401- sin autenticacion
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
-        // return new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
         return (request, response, authException) -> {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
@@ -56,10 +57,9 @@ public class SecurityConfig {
         };
     }
 
-    // 🔹 Manejador para 403 (sin permisos)
+    //403- prohibido-sin permisos
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
-        // return new AccessDeniedHandlerImpl();
         return (request, response, accessDeniedException) -> {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setContentType("application/json");
@@ -80,7 +80,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login", "/auth/login-admin", "/auth/register-admin", "/auth/register",
                                 "/imagenes/**", "/productos/**")
                         .permitAll()
-                        .requestMatchers("/auth/otro").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/auth/otro").hasRole("ADMIN")
                         .requestMatchers("/productos/otro").hasRole("USER")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
@@ -97,25 +97,14 @@ public class SecurityConfig {
 
         // config.setAllowedOriginPatterns(Arrays.asList("*"));
         config.setAllowedOrigins(List.of("http://localhost:4200"));
-        config.setAllowedMethods(List.of("POST", "PUT", "GET", "DELETE"));
+        config.setAllowedMethods(List.of("POST", "PUT", "GET", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
-    // ! no se necesita porque arriba ya se define el .cors(cors ->
-    // cors.configurationSource...)
-    // @Bean
-    // FilterRegistrationBean<CorsFilter> corsFilter() {
-    // FilterRegistrationBean<CorsFilter> corsBean = new
-    // FilterRegistrationBean<CorsFilter>(
-    // new CorsFilter(this.configurationSource()));
-
-    // corsBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-    // return corsBean;
-    // }
 
 }

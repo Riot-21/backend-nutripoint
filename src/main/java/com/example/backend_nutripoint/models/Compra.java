@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+// @AllArgsConstructor
 public class Compra {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

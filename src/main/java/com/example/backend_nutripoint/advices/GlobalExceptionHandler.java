@@ -12,7 +12,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-// import com.example.backend_nutripoint.exceptions.AccessDeniedException;
 import com.example.backend_nutripoint.exceptions.ImageUploadException;
 import com.example.backend_nutripoint.exceptions.NotFoundException;
 

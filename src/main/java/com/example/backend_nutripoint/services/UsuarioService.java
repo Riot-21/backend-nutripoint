@@ -1,12 +1,12 @@
 package com.example.backend_nutripoint.services;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.backend_nutripoint.DTO.UsuarioDTO;
+import com.example.backend_nutripoint.exceptions.NotFoundException;
 import com.example.backend_nutripoint.models.Usuario;
 import com.example.backend_nutripoint.repositories.UsuarioRepository;
 
@@ -28,14 +28,21 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public UsuarioDTO findById(Integer id){
         Usuario user = usuarioRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado con ID: "+ id));
+            .orElseThrow(() -> new NotFoundException("Usuario no encontrado con ID: "+ id));
         return convertToDTO(user);
-        }
+    }
+
+    @Transactional(readOnly = true)
+    public UsuarioDTO findByEmail(String email){
+        Usuario user = usuarioRepository.findByEmail(email)
+            .orElseThrow(() -> new NotFoundException("Usuario no encontrado con email: "+ email));
+        return convertToDTO(user);
+    }
 
     @Transactional
     public UsuarioDTO updateUser(Integer id, UsuarioDTO userDTO){
         Usuario user = usuarioRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado por ID: "+id));
+            .orElseThrow(() -> new NotFoundException("Usuario no encontrado por ID: "+id));
 
             user.setNombres(userDTO.getNombres());
             user.setApellidos(userDTO.getApellidos());

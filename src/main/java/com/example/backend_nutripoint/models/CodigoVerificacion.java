@@ -8,7 +8,7 @@ import java.util.Date;
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+// @AllArgsConstructor
 @Table(name = "codigo_verificacion")
 public class CodigoVerificacion {
     @Id

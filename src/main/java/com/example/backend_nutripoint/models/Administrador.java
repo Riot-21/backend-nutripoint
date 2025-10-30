@@ -6,7 +6,7 @@ import lombok.*;
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+// @AllArgsConstructor
 @Table(name = "administrador")
 public class Administrador {
     @Id

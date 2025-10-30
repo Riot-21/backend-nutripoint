@@ -7,15 +7,13 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+// @AllArgsConstructor
 @Table(name = "img_prod")
 public class ImgProd {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idImg;
 
-    // @Column(nullable = false, columnDefinition = "LONGBLOB")
-    // private byte[] image;
     @Column(nullable = false)
     private String imageUrl;
 

@@ -32,12 +32,16 @@ public class UsuarioController {
     private final UsuarioRepository usuarioRepository;
     
     @GetMapping("/profile")
-    public ResponseEntity<Usuario> verPerfil(Authentication auth) {
-        Usuario usuario = usuarioRepository.findByEmail(auth.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
-
-        return ResponseEntity.ok(usuario);
+    public ResponseEntity<UsuarioDTO> verPerfil(Authentication auth) {
+        UsuarioDTO user = userService.findByEmail(auth.getName());
+        return ResponseEntity.ok(user);
     }
+
+    @GetMapping("/otro")
+    public String hola() {
+        return "hola";
+    }
+    
 
     @PutMapping("/profile")
     public ResponseEntity<?> updateProfile(Authentication auth, @Valid @RequestBody UsuarioDTO usuarioDTO, BindingResult result) {
