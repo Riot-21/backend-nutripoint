@@ -44,10 +44,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwt = bearerToken.substring(7); // PREFIX_TOKEN.length()
             Claims claims = jwtService.getTokenClaims(jwt);
             // System.out.println(jwt);
-            if (claims == null) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
-                return;
-            }
+            //! VALIDACION INNECESARIA YA QUE LAS EXCEPCIONES LAS MANEJA JWTSERVICE
+            // if (claims == null) {
+            //     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
+            //     return;
+            // }
 
             String email = claims.getSubject();
             var userDetails = userService.loadUserByUsername(email);

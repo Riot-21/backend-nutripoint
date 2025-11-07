@@ -9,10 +9,12 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 
 @Service
 public class JwtService {
@@ -24,8 +26,8 @@ public class JwtService {
     private String issuer;
 
     public String createJwtToken(Usuario user) {
-        byte[] ketBytes = Decoders.BASE64.decode(secretKey);
-        var key = Keys.hmacShaKeyFor(ketBytes);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        var key = Keys.hmacShaKeyFor(keyBytes);
         // var key = getSigningKey();
         return Jwts
                 .builder()
@@ -49,14 +51,11 @@ public class JwtService {
                     .parseSignedClaims(token)
                     .getPayload();
 
-        } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            
+        } catch (ExpiredJwtException e) {
             throw new JwtException("El token ha expirado");
-        } catch (io.jsonwebtoken.security.SignatureException e) {
-            
+        } catch (SignatureException e) {
             throw new JwtException("Firma JWT no válida");
         } catch (JwtException e) {
-            // Cualquier otro error JWT
             throw new JwtException("Token inválido: " + e.getMessage());
         } catch (Exception e) {
             throw new RuntimeException("Error al procesar el token: " + e.getMessage());

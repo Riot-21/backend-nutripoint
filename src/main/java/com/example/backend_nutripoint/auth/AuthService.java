@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.backend_nutripoint.exceptions.NotFoundException;
 import com.example.backend_nutripoint.exceptions.UserNotFoundException;
 import com.example.backend_nutripoint.jwt.JwtService;
 import com.example.backend_nutripoint.models.Role;
@@ -47,6 +48,13 @@ public class AuthService {
         userRepository.save(user);
 
         return buildAuthResponse(user);
+    }
+
+    @Transactional
+    public AuthResponse refreshToken(String email){
+        Usuario u = userRepository.findByEmail(email)
+            .orElseThrow(()-> new NotFoundException("user not found: email->"+email));;
+        return buildAuthResponse(u);
     }
 
     private AuthResponse buildAuthResponse(Usuario user) {
