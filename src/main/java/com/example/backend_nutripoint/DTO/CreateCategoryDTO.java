@@ -1,8 +1,6 @@
-package com.example.backend_nutripoint.auth;
+package com.example.backend_nutripoint.DTO;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 // import lombok.AllArgsConstructor;
 // import lombok.Builder;
 // import lombok.NoArgsConstructor;
@@ -14,12 +12,11 @@ import lombok.Setter;
 // @Builder
 // @AllArgsConstructor
 // @NoArgsConstructor
-public class LoginRequest {
-    @NotBlank
-    @Email
-    private String email;
+public class CreateCategoryDTO {
 
     @NotBlank
-    @Size(min = 8, max = 64)
-    private String password;
+    private String categoria;
+
+    @NotBlank
+    private String objetivo;
 }

@@ -3,6 +3,8 @@ package com.example.backend_nutripoint.services;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,9 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.backend_nutripoint.DTO.CreateProductDTO;
 import com.example.backend_nutripoint.DTO.ProductFilterDTO;
 import com.example.backend_nutripoint.DTO.ProductResponseDTO;
+import com.example.backend_nutripoint.DTO.UpdateProductDTO;
 import com.example.backend_nutripoint.exceptions.NotFoundException;
+import com.example.backend_nutripoint.models.Categoria;
 import com.example.backend_nutripoint.models.ImgProd;
 import com.example.backend_nutripoint.models.Producto;
+import com.example.backend_nutripoint.repositories.CategoryRepository;
 import com.example.backend_nutripoint.repositories.ProductoRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductoRepository productoRepository;
+    private final CategoryRepository categoryRepository;
     private final ImgProdService imgProdService;
 
     @Transactional(readOnly = true)
@@ -85,6 +91,18 @@ public class ProductService {
         prod.setModEmpleo(dto.getModEmpleo());
         prod.setAdvert(dto.getAdvert());
 
+        Set<Categoria> categorias = validateCategories(dto.getCategorias());
+        prod.setCategorias(categorias);
+
+        // Set<Categoria> categorias = dto.getCategorias().stream()
+        // .distinct()
+        // .map(cat -> categoryRepository.findByCategoria(cat)
+        // .orElseThrow(() -> new IllegalArgumentException("La categoria: " + cat + " no
+        // existe")))
+        // // .toList();
+        // .collect(Collectors.toSet());
+        // prod.setCategorias(categorias);
+
         Producto savedProduct = productoRepository.save(prod);
         List<String> imagenesURL = new ArrayList<>();
 
@@ -93,6 +111,39 @@ public class ProductService {
         }
 
         return mapToDTO(savedProduct, imagenesURL);
+    }
+
+    @Transactional
+    public ProductResponseDTO updateProduct(Integer id, UpdateProductDTO dto) {
+        Producto prod = productoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Producto no encontrado. ID: " + id));
+        if (dto.getNombre() != null)
+            prod.setNombre(dto.getNombre());
+        if (dto.getDescripcion() != null)
+            prod.setDescripcion(dto.getDescripcion());
+        if (dto.getStock() != null)
+            prod.setStock(dto.getStock());
+        if (dto.getMarca() != null)
+            prod.setMarca(dto.getMarca());
+        if (dto.getPrecioUnit() != null)
+            prod.setPrecioUnit(dto.getPrecioUnit());
+        if (dto.getModEmpleo() != null)
+            prod.setModEmpleo(dto.getModEmpleo());
+        if (dto.getAdvert() != null)
+            prod.setAdvert(dto.getAdvert());
+
+        if (dto.getCategorias() != null && !dto.getCategorias().isEmpty()) {
+            Set<Categoria> categorias = validateCategories(dto.getCategorias());
+            prod.setCategorias(categorias);
+        }
+
+        if (dto.getImagenes() != null && !dto.getImagenes().isEmpty()) {
+            imgProdService.uploadImage(dto.getImagenes(), prod.getIdProducto());
+        }
+
+        Producto updatedProduct = productoRepository.save(prod);
+        List<String> imagenes = getImageUrlsFromEntity(updatedProduct);
+        return mapToDTO(updatedProduct, imagenes);
     }
 
     @Transactional(readOnly = true)
@@ -118,6 +169,7 @@ public class ProductService {
                 .modEmpleo(prod.getModEmpleo())
                 .advert(prod.getAdvert())
                 .imagenesUrls(imagenesUrls)
+                .categorias(prod.getCategorias().stream().map(Categoria::getCategoria).toList())
                 .build();
     }
 
@@ -128,5 +180,13 @@ public class ProductService {
         return product.getImagenes().stream()
                 .map(ImgProd::getImageUrl)
                 .toList();
+    }
+
+    private Set<Categoria> validateCategories(List<String> categorias) {
+        return categorias.stream()
+                .distinct()
+                .map(cat -> categoryRepository.findByCategoria(cat)
+                        .orElseThrow(() -> new IllegalArgumentException("La categoria: " + cat + " no existe")))
+                .collect(Collectors.toSet());
     }
 }

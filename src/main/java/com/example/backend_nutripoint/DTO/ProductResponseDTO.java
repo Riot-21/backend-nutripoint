@@ -21,5 +21,6 @@ public class ProductResponseDTO {
     private BigDecimal preciounit;
     private String modEmpleo;
     private String advert;
+    private List<String> categorias;
     private List<String> imagenesUrls;
 }

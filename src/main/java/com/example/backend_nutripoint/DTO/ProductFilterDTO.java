@@ -5,13 +5,16 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
 public class ProductFilterDTO {
 
+    @Size(min = 1, message = "debe tener minimo 1 caracter")
     private String query;
 
+    @Size(min = 1, message = "no debe estar vacio")
     private String marca;
 
     @DecimalMin(value = "0.00")

@@ -22,7 +22,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.backend_nutripoint.jwt.JwtAuthenticationFilter;
 
-
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -35,19 +34,17 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationConfiguration authenticationconfiguration;
 
-
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
         return authenticationconfiguration.getAuthenticationManager();
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    //401- sin autenticacion
+    // 401- sin autenticacion
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return (request, response, authException) -> {
@@ -57,7 +54,7 @@ public class SecurityConfig {
         };
     }
 
-    //403- prohibido-sin permisos
+    // 403- prohibido-sin permisos
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
         return (request, response, accessDeniedException) -> {
@@ -77,10 +74,16 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/login-admin", "/auth/register-admin", "/auth/register",
-                                "/imagenes/**", "/productos/**")
+                        .requestMatchers(
+                                "/auth/login",
+                                "/category/**",
+                                // "/auth/login-admin",
+                                // "/auth/register-admin",
+                                "/auth/register",
+                                "/imagenes/**",
+                                "/productos/**")
                         .permitAll()
-                        .requestMatchers("/auth/otro").hasRole("ADMIN")
+                        .requestMatchers("/auth/otro", "/auth/register-admin").hasRole("ADMIN")
                         .requestMatchers("/productos/otro").hasRole("USER")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

@@ -11,17 +11,17 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+// import lombok.AllArgsConstructor;
+// import lombok.Builder;
+// import lombok.NoArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+// @Builder
+// @AllArgsConstructor
+// @NoArgsConstructor
 public class RegisterRequest {
 
     @NotBlank
