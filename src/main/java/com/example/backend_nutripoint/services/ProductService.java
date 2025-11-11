@@ -155,8 +155,18 @@ public class ProductService {
 
     @Transactional
     public void deleteProducto(Integer id) {
-        productoRepository.deleteById(id);
+        Producto prod = productoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("No hay ese producto"));
+
+        List<ImgProd> imagenes = prod.getImagenes();
+        if(imagenes!=null && !imagenes.isEmpty()){
+            for(ImgProd img : imagenes){
+                imgProdService.deleteImage(img.getIdImg());
+            }
+        }
+        productoRepository.delete(prod);
     }
+
 
     private ProductResponseDTO mapToDTO(Producto prod, List<String> imagenesUrls) {
         return ProductResponseDTO.builder()

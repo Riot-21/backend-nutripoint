@@ -65,4 +65,7 @@ public class Producto {
 
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
     private List<ImgProd> imagenes;
+
+    @OneToMany(mappedBy = "producto", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<DetalleCompra> compras;
 }
