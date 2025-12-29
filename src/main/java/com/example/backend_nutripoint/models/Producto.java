@@ -13,8 +13,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,12 +26,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-// @AllArgsConstructor
+@AllArgsConstructor
 public class Producto {
     //!DIFERENCIA ENTRE INTGER E INT: INTEGER ES MEJOR PARA ID PORQUE ES NECESARIO QUE PERMITA NULL ANTES DE SER CREADO EN BD
     //!INT DEFINE SIEMPRE CON 0, POR LO QUE SIEMPRE OBLIGA A QUE HAYA UN VALOR
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //TODO: Cambiar Integer por Long
     private Integer idProducto;
 
     @Column(nullable = false, unique = true)
@@ -41,8 +44,8 @@ public class Producto {
     @Column(nullable = false)
     private Integer stock;
 
-    @Column(nullable = false)
-    private String marca;
+    // @Column(nullable = false)
+    // private String marca;
 
     @Column(nullable = false, precision = 10, scale = 2)
     // private Double precioUnit;
@@ -54,18 +57,21 @@ public class Producto {
     @Column(nullable = false)
     private String advert;
 
+    @ManyToOne
+    @JoinColumn(name = "marca_id", nullable = false)
+    private Marca marca;
+
     @ManyToMany
     @JoinTable(
             name = "prod_categoria",
             joinColumns = @JoinColumn(name = "id_producto"),
             inverseJoinColumns = @JoinColumn(name = "id_categoria")
     )
-    // private List<Categoria> categorias;
     private Set<Categoria> categorias;
 
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
     private List<ImgProd> imagenes;
 
-    @OneToMany(mappedBy = "producto", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "producto")
     private List<DetalleCompra> compras;
 }

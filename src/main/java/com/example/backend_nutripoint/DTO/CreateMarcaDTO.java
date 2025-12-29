@@ -6,11 +6,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateCategoryDTO {
+public class CreateMarcaDTO {
 
     @NotBlank
-    private String categoria;
-
-    @NotBlank
-    private String objetivo;
+    private String marca;
 }

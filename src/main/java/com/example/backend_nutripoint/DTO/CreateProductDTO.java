@@ -12,18 +12,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-// import lombok.AllArgsConstructor;
-// import lombok.Builder;
-// import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 
 @Getter
 @Setter
-// @Builder
-// @AllArgsConstructor
-// @NoArgsConstructor
 public class CreateProductDTO {
 
     @NotBlank(message = "El nombre es obligatorio")
@@ -52,7 +46,6 @@ public class CreateProductDTO {
     private String advert;
 
     @NotEmpty(message = "Debe haber al menos 1 categoria")
-    // @Size(min = 1, message = "Debe haber minimo 1 categoria")
     private List<@NotBlank String> categorias;
 
     @Size(max = 3, message = "Solo se permiten hasta 3 imágenes")

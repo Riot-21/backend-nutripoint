@@ -15,14 +15,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.backend_nutripoint.DTO.CreateProductDTO;
+import com.example.backend_nutripoint.DTO.PriceRangeDTO;
 import com.example.backend_nutripoint.DTO.ProductFilterDTO;
 import com.example.backend_nutripoint.DTO.ProductResponseDTO;
 import com.example.backend_nutripoint.DTO.UpdateProductDTO;
 import com.example.backend_nutripoint.exceptions.NotFoundException;
 import com.example.backend_nutripoint.models.Categoria;
 import com.example.backend_nutripoint.models.ImgProd;
+import com.example.backend_nutripoint.models.Marca;
 import com.example.backend_nutripoint.models.Producto;
 import com.example.backend_nutripoint.repositories.CategoryRepository;
+import com.example.backend_nutripoint.repositories.MarcaRepository;
 import com.example.backend_nutripoint.repositories.ProductoRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -32,8 +35,12 @@ import lombok.RequiredArgsConstructor;
 public class ProductService {
     private final ProductoRepository productoRepository;
     private final CategoryRepository categoryRepository;
+    private final MarcaRepository marcaRepository;
     private final ImgProdService imgProdService;
 
+    // Metodo para traer las marcas
+
+    // Metodo principal para traer productos paginados por defecto
     @Transactional(readOnly = true)
     public Page<ProductResponseDTO> searchProducts(ProductFilterDTO filterDTO) {
         Specification<Producto> spec = Specification.unrestricted();
@@ -46,9 +53,35 @@ public class ProductService {
         }
 
         // Filtro por marca
-        if (filterDTO.getMarca() != null && !filterDTO.getMarca().isBlank()) {
-            spec = spec.and(
-                    (root, query, cb) -> cb.equal(cb.lower(root.get("marca")), filterDTO.getMarca().toLowerCase()));
+        // if (filterDTO.getMarca() != null && !filterDTO.getMarca().isBlank()) {
+        // spec = spec.and(
+        // (root, query, cb) -> cb.equal(cb.lower(root.get("marca")),
+        // filterDTO.getMarca().toLowerCase()));
+        // }
+
+        // Filtro por múltiples marcas
+        if (filterDTO.getMarcas() != null && !filterDTO.getMarcas().isEmpty()) {
+            spec = spec.and((root, query, cb) -> {
+                if (query != null)
+                    query.distinct(true);
+                return cb.lower(root.get("marca").get("nombre")).in(
+                        filterDTO.getMarcas()
+                                .stream()
+                                .map(String::toLowerCase)
+                                .toList());
+            });
+        }
+
+        // filtro por categorias
+        if (filterDTO.getCategorias() != null && !filterDTO.getCategorias().isEmpty()) {
+            spec = spec.and((root, query, cb) -> {
+                if (query != null)
+                    query.distinct(true);
+                return cb.lower(root.get("categorias").get("categoria")).in(
+                        filterDTO.getCategorias()
+                                .stream().map(String::toLowerCase)
+                                .toList());
+            });
         }
 
         // Filtro por rango de precios
@@ -77,6 +110,7 @@ public class ProductService {
         return productosPage.map(product -> mapToDTO(product, getImageUrlsFromEntity(product)));
     }
 
+    // Metodo para crear un producto
     @Transactional
     public ProductResponseDTO createProduct(CreateProductDTO dto) throws IOException {
         if (productoRepository.existsByNombre(dto.getNombre())) {
@@ -86,22 +120,15 @@ public class ProductService {
         prod.setNombre(dto.getNombre());
         prod.setDescripcion(dto.getDescripcion());
         prod.setStock(dto.getStock());
-        prod.setMarca(dto.getMarca());
+        // prod.setMarca(dto.getMarca());
         prod.setPrecioUnit(dto.getPrecioUnit());
         prod.setModEmpleo(dto.getModEmpleo());
         prod.setAdvert(dto.getAdvert());
 
         Set<Categoria> categorias = validateCategories(dto.getCategorias());
         prod.setCategorias(categorias);
-
-        // Set<Categoria> categorias = dto.getCategorias().stream()
-        // .distinct()
-        // .map(cat -> categoryRepository.findByCategoria(cat)
-        // .orElseThrow(() -> new IllegalArgumentException("La categoria: " + cat + " no
-        // existe")))
-        // // .toList();
-        // .collect(Collectors.toSet());
-        // prod.setCategorias(categorias);
+        Marca marca = validateMarca(dto.getMarca());
+        prod.setMarca(marca);
 
         Producto savedProduct = productoRepository.save(prod);
         List<String> imagenesURL = new ArrayList<>();
@@ -123,8 +150,10 @@ public class ProductService {
             prod.setDescripcion(dto.getDescripcion());
         if (dto.getStock() != null)
             prod.setStock(dto.getStock());
-        if (dto.getMarca() != null)
-            prod.setMarca(dto.getMarca());
+        if (dto.getMarca() != null) {
+            Marca marca = validateMarca(dto.getMarca());
+            prod.setMarca(marca);
+        }
         if (dto.getPrecioUnit() != null)
             prod.setPrecioUnit(dto.getPrecioUnit());
         if (dto.getModEmpleo() != null)
@@ -159,22 +188,33 @@ public class ProductService {
                 .orElseThrow(() -> new NotFoundException("No hay ese producto"));
 
         List<ImgProd> imagenes = prod.getImagenes();
-        if(imagenes!=null && !imagenes.isEmpty()){
-            for(ImgProd img : imagenes){
+        if (imagenes != null && !imagenes.isEmpty()) {
+            for (ImgProd img : imagenes) {
                 imgProdService.deleteImage(img.getIdImg());
             }
         }
         productoRepository.delete(prod);
     }
 
+    @Transactional
+    public PriceRangeDTO getPriceRange(){
+        Double min = productoRepository.findMinPrice();
+        Double max = productoRepository.findMaxPrice();
 
+        if(min==null || max==null){
+            return new PriceRangeDTO(0.0, 0.0);
+        }
+
+        return new PriceRangeDTO(min, max);
+    }
+    // Mapper para convertir a formato response
     private ProductResponseDTO mapToDTO(Producto prod, List<String> imagenesUrls) {
         return ProductResponseDTO.builder()
                 .idProducto(prod.getIdProducto())
                 .nombre(prod.getNombre())
                 .descripcion(prod.getDescripcion())
                 .stock(prod.getStock())
-                .marca(prod.getMarca())
+                .marca(prod.getMarca().getNombre())
                 .preciounit(prod.getPrecioUnit())
                 .modEmpleo(prod.getModEmpleo())
                 .advert(prod.getAdvert())
@@ -183,6 +223,7 @@ public class ProductService {
                 .build();
     }
 
+    // Metodo que trae las imagenes segun el producto
     private List<String> getImageUrlsFromEntity(Producto product) {
         if (product.getImagenes() == null || product.getImagenes().isEmpty()) {
             return List.of();
@@ -192,11 +233,22 @@ public class ProductService {
                 .toList();
     }
 
+    // Metodo que filtra las categorias antes de crear o actualizar un producto
+    // Las categorias se asignan, osea tienen que existir
+    // Se usa distinct() para evitar mandar duplicados, igualmente el tipo
+    // categorias es set(tambien evita duplicados)
     private Set<Categoria> validateCategories(List<String> categorias) {
         return categorias.stream()
                 .distinct()
                 .map(cat -> categoryRepository.findByCategoria(cat)
                         .orElseThrow(() -> new IllegalArgumentException("La categoria: " + cat + " no existe")))
                 .collect(Collectors.toSet());
+    }
+
+    private Marca validateMarca(String marca) {
+        Marca m = marcaRepository.findByNombre(marca)
+                .orElseThrow(() -> new IllegalArgumentException("La marca noexiste"));
+
+        return m;
     }
 }

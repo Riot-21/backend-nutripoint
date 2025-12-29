@@ -39,7 +39,6 @@ public class Compra {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    // private String tipo_pago ;
     private TipoPago tipoPago ;
 
     @Column(nullable = false)

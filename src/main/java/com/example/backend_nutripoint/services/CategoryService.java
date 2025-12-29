@@ -52,12 +52,11 @@ public class CategoryService {
     public CategoryResponseDTO updateCategory(UpdateCategoryDTO cat, Integer id) {
         Categoria categoria = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Categoria no encontrada. id: " + id));
-        
 
-        if(cat.getCategoria()!= null){
+        if (cat.getCategoria() != null) {
             categoria.setCategoria(cat.getCategoria());
         }
-        if(cat.getObjetivo()!= null){
+        if (cat.getObjetivo() != null) {
             categoria.setObjetivo(cat.getObjetivo());
         }
 
@@ -70,15 +69,16 @@ public class CategoryService {
         Categoria cat = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Categoria no existente"));
 
-        if(!cat.getProductos().isEmpty()){
+        if (!cat.getProductos().isEmpty()) {
             String products = cat.getProductos().stream()
-            .map(Producto::getNombre)
-            // .map(p->p.getNombre())
-            .collect(Collectors.joining(", "));
-            throw new IllegalArgumentException("No se puede eliminar una categoria asociada a productos. Productos: "+products);
+                    .map(Producto::getNombre)
+                    // .map(p->p.getNombre())
+                    .collect(Collectors.joining(", "));
+            throw new IllegalArgumentException(
+                    "No se puede eliminar una categoria asociada a productos. Productos: " + products);
         }
 
-        //Para romper relacion con la tabla intermedia y sus productos
+        // Para romper relacion con la tabla intermedia y sus productos
         // cat.getProductos().forEach(prod-> prod.getCategorias().remove(cat));
         categoryRepository.delete(cat);
     }

@@ -1,35 +1,32 @@
 package com.example.backend_nutripoint.models;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@Table(name = "marcas")
 @Getter
 @Setter
 @NoArgsConstructor
-// @AllArgsConstructor
-@Table(name = "img_prod")
-public class ImgProd {
+public class Marca {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idImg;
+    private Long id;
 
-    @Column(nullable = false)
-    private String imageUrl;
+    @Column(nullable = false, unique = true)
+    private String nombre;
 
-    @Column(nullable = false)
-    private String contentType;
-
-    @ManyToOne
-    @JoinColumn(name = "id_producto", nullable = false)
-    private Producto producto;
+    @OneToMany(mappedBy = "marca")
+    private List<Producto> producto;
 }

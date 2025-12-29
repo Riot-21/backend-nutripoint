@@ -1,5 +1,7 @@
 package com.example.backend_nutripoint.DTO;
 
+import java.util.List;
+
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Min;
@@ -14,15 +16,20 @@ public class ProductFilterDTO {
     @Size(min = 1, message = "debe tener minimo 1 caracter")
     private String query;
 
-    @Size(min = 1, message = "no debe estar vacio")
-    private String marca;
+    // @Size(min = 1, message = "no debe estar vacio")
+    // private String marca;
+    private List<
+    @Size(min = 1, message = "no debe estar vacio") 
+    String> marcas;
+
+    private List<
+    @Size(min = 1, message = "no debe estar vacio") 
+    String> categorias;
 
     @DecimalMin(value = "0.00")
     @Digits(integer = 8, fraction = 2, message = "El precio debe tener como máximo 8 dígitos enteros y 2 decimales")
     private Double precioMin;
 
-    // @NumberFormat(style = Style.NUMBER, pattern = "0.00")
-    // @Min(value = 0, message = "El valor minimo debe ser 0")
     @DecimalMin(value = "0.01")
     @Digits(integer = 8, fraction = 2, message = "El precio debe tener como máximo 8 dígitos enteros y 2 decimales")
     private Double precioMax;

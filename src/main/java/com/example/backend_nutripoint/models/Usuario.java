@@ -55,13 +55,12 @@ public class Usuario {
     @Column(nullable = false)
     private Boolean estado = true;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "usuario", cascade = {CascadeType.PERSIST})
     private List<Compra> compras;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "usuario_roles", joinColumns = @JoinColumn(name = "usuario_id"))
     @Enumerated(EnumType.STRING)
-    // @Column(nullable = false)
     private List<Role> roles;
 
 }

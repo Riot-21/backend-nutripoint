@@ -77,6 +77,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/auth/login",
                                 "/category/**",
+                                "/marca/**",
                                 // "/auth/login-admin",
                                 // "/auth/register-admin",
                                 "/auth/register",
@@ -100,7 +101,7 @@ public class SecurityConfig {
 
         // config.setAllowedOriginPatterns(Arrays.asList("*"));
         config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:5173"));
-        config.setAllowedMethods(List.of("POST", "PUT", "GET", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("POST", "PUT", "GET", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 // import com.cloudinary.http5.api.Response;
 import com.example.backend_nutripoint.DTO.CreateProductDTO;
+import com.example.backend_nutripoint.DTO.PriceRangeDTO;
 import com.example.backend_nutripoint.DTO.ProductFilterDTO;
 import com.example.backend_nutripoint.DTO.ProductResponseDTO;
 import com.example.backend_nutripoint.DTO.UpdateProductDTO;
@@ -23,6 +24,7 @@ import com.example.backend_nutripoint.services.ProductService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 
 
 @RestController
@@ -80,5 +82,11 @@ public class ProductController {
         productService.deleteProducto(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/price-range")
+    public ResponseEntity<PriceRangeDTO> getPriceRange() {
+        return ResponseEntity.ok(productService.getPriceRange());
+    }
+    
 
 }
