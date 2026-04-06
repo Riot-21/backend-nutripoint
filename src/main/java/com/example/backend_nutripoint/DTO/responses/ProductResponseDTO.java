@@ -1,4 +1,4 @@
-package com.example.backend_nutripoint.DTO;
+package com.example.backend_nutripoint.DTO.responses;
 
 import java.math.BigDecimal;
 import java.util.List;

@@ -1,6 +1,7 @@
 package com.example.backend_nutripoint.advices;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,7 +50,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error ", ex.getMessage()));
+                .body(Map.of("error", ex.getMessage()));
     }
 
     // Manejo genérico para excepciones no controladas
@@ -89,9 +90,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> handleJsonParseError(HttpMessageNotReadableException ex) {
-        // String message = "Formato JSON inválido o rol no reconocido. Verifica los
-        // roles permitidos: USER, ADMIN, SUPER_ADMIN.";
+        String message = "Formato JSON inválido o rol no reconocido. Verifica los roles permitidos: USER, ADMIN, SUPER_ADMIN.";
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", message));
+    }
+
+    @ExceptionHandler(GeneralSecurityException.class)
+    public ResponseEntity<Map<String, String>> handleGeneralSecurityException(GeneralSecurityException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("error", ex.getMessage()));
     }
 }

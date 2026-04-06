@@ -1,4 +1,4 @@
-package com.example.backend_nutripoint.DTO;
+package com.example.backend_nutripoint.DTO.requests;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

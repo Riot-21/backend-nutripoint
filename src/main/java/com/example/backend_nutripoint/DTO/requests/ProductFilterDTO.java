@@ -1,9 +1,10 @@
-package com.example.backend_nutripoint.DTO;
+package com.example.backend_nutripoint.DTO.requests;
 
 import java.util.List;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
@@ -38,6 +39,7 @@ public class ProductFilterDTO {
     private Integer page = 0;
 
     @Positive(message = "El tamaño de pagina debe ser mayor a 0")
+    @Max(value = 100, message = "El tamaño de pagina no puede ser mayor a 100")
     private Integer size = 10;
 
     @Pattern(regexp = "nombre|precioUnit|idProducto", message = "sort value just can be 'nombre', 'precioUnit', 'idProducto'")

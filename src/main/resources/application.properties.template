@@ -1,25 +1,38 @@
 spring.application.name=backend-nutripoint
 
 # Base de datos
-spring.datasource.url=jdbc:mysql://localhost:3306/(BD**)?useSSL=false&serverTimezone=UTC
-spring.datasource.username= user**
-spring.datasource.password= password**
+spring.datasource.url=jdbc:mysql://localhost:3306/NOMBRE_DE_BD?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+spring.datasource.username= username
+spring.datasource.password= password
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.jpa.hibernate.ddl-auto=update
-
-
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
 
 # Servidor
 server.port=8082
+server.servlet.context-path=/api
 
 #JWT
 security.jwt.secret-key=**clave secreta jwt**
 security.jwt.expiration-time-ms=3600000
 security.jwt.issuer=nutripoint API- RIOT
 
-#comentario
+#Keys para servicio de cloudinary
 cloudinary.cloud_name=(cloudinary)
 cloudinary.api_key=(api key de cloudinary)
 cloudinary.api_secret=(api_secret de cloudinary)
+
+#Para evitar campos desconocidos
+spring.jackson.deserialization.fail-on-unknown-properties=true
+
+# Configuración de Correo (Gmail) - REEMPLAZAR CON TUS CREDENCIALES
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=tucorreo@gmail.com
+spring.mail.password=contraseña 
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+
+#Google Oauth
+google-client-id=id_de_google_oauth

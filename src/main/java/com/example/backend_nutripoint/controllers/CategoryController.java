@@ -3,9 +3,9 @@ package com.example.backend_nutripoint.controllers;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.backend_nutripoint.DTO.CategoryResponseDTO;
-import com.example.backend_nutripoint.DTO.CreateCategoryDTO;
-import com.example.backend_nutripoint.DTO.UpdateCategoryDTO;
+import com.example.backend_nutripoint.DTO.requests.CategoryCreateDTO;
+import com.example.backend_nutripoint.DTO.requests.CategoryUpdateDTO;
+import com.example.backend_nutripoint.DTO.responses.CategoryResponseDTO;
 import com.example.backend_nutripoint.services.CategoryService;
 
 import jakarta.validation.Valid;
@@ -42,12 +42,12 @@ public class CategoryController {
     }
     
     @PostMapping
-    public ResponseEntity<CategoryResponseDTO> createCategory(@Valid @RequestBody CreateCategoryDTO category) {
+    public ResponseEntity<CategoryResponseDTO> createCategory(@Valid @RequestBody CategoryCreateDTO category) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(category));
     }
     
     @PatchMapping("/{id}")
-    public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Integer id, @Valid @RequestBody UpdateCategoryDTO cat) {
+    public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Integer id, @Valid @RequestBody CategoryUpdateDTO cat) {
         return ResponseEntity.ok(categoryService.updateCategory(cat, id));
     }
 

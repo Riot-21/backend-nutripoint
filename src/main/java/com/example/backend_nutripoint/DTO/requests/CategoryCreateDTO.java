@@ -1,4 +1,4 @@
-package com.example.backend_nutripoint.DTO;
+package com.example.backend_nutripoint.DTO.requests;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateCategoryDTO {
+public class CategoryCreateDTO {
 
     @NotBlank
     private String categoria;

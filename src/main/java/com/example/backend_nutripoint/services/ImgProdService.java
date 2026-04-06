@@ -36,6 +36,7 @@ public class ImgProdService {
 
     @Transactional
     public List<String> uploadImage(List<MultipartFile> files, Integer productoId) {
+        // @SuppressWarnings("null")
         Producto producto = productoRepository.findById(productoId)
                 .orElseThrow(() -> new NotFoundException("Producto no encontrado"));
 
@@ -93,6 +94,7 @@ public class ImgProdService {
         return imagenes.stream().map(ImgProd::getImageUrl).toList();
     }
 
+    // @SuppressWarnings("null")
     @Transactional
     public void deleteImage(Integer idImg) {
         ImgProd imgProd = imgProdRepository.findById(idImg)
@@ -108,7 +110,6 @@ public class ImgProdService {
 
         imgProdRepository.deleteById(idImg);
     }
-
 
     private void validateImage(MultipartFile file) {
         String mimeType = file.getContentType();

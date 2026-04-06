@@ -1,5 +1,6 @@
 package com.example.backend_nutripoint.models;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -41,19 +42,25 @@ public class Usuario {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 
     //! AQUI HAY UN ATRIBUTO UPDATABLE--REVISAR LUEGO PARA VER EN QUE OTROS CASOS USARLA
     //, updatable = false
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = true)
     private String dni;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String telefono;
 
     @Column(nullable = false)
     private Boolean estado = true;
+
+    @Column(nullable = true)
+    private String recoveryCode;
+    
+    @Column(nullable = true)
+    private LocalDateTime recoveryCodeExpiration;
 
     @OneToMany(mappedBy = "usuario", cascade = {CascadeType.PERSIST})
     private List<Compra> compras;

@@ -3,8 +3,8 @@ package com.example.backend_nutripoint.controllers;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.backend_nutripoint.DTO.CompraRequestDTO;
-import com.example.backend_nutripoint.DTO.CompraResponseDTO;
+import com.example.backend_nutripoint.DTO.requests.CompraRequestDTO;
+import com.example.backend_nutripoint.DTO.responses.CompraResponseDTO;
 import com.example.backend_nutripoint.services.CompraService;
 
 import jakarta.validation.Valid;

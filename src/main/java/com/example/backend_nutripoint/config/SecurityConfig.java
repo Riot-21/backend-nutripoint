@@ -76,6 +76,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/login",
+                                "/auth/google-login",
+                                "/auth/google-register",
+                                "/auth/recover-password",
+                                "/auth/reset-password",
                                 "/category/**",
                                 "/marca/**",
                                 // "/auth/login-admin",
@@ -100,7 +104,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // config.setAllowedOriginPatterns(Arrays.asList("*"));
-        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:5173"));
+        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:5173", "http://localhost:5174"));
         config.setAllowedMethods(List.of("POST", "PUT", "GET", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(true);

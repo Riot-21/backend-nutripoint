@@ -6,10 +6,11 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.backend_nutripoint.DTO.CategoryResponseDTO;
-import com.example.backend_nutripoint.DTO.CreateCategoryDTO;
-import com.example.backend_nutripoint.DTO.UpdateCategoryDTO;
+import com.example.backend_nutripoint.DTO.requests.CategoryCreateDTO;
+import com.example.backend_nutripoint.DTO.requests.CategoryUpdateDTO;
+import com.example.backend_nutripoint.DTO.responses.CategoryResponseDTO;
 import com.example.backend_nutripoint.exceptions.NotFoundException;
+import com.example.backend_nutripoint.mappers.CategoryMapper;
 import com.example.backend_nutripoint.models.Categoria;
 import com.example.backend_nutripoint.models.Producto;
 import com.example.backend_nutripoint.repositories.CategoryRepository;
@@ -25,18 +26,19 @@ public class CategoryService {
     @Transactional(readOnly = true)
     public List<CategoryResponseDTO> getAllCategories() {
         return categoryRepository.findAll().stream()
-                .map(cat -> mapToDTO(cat)).toList();
+                .map(cat -> CategoryMapper.categoryToDTO(cat)).toList();
     }
 
     @Transactional(readOnly = true)
     public CategoryResponseDTO getCategoryById(Integer id) {
+        // @SuppressWarnings("null")
         Categoria cat = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Categoria no encontrada. id: " + id));
-        return mapToDTO(cat);
+        return CategoryMapper.categoryToDTO(cat);
     }
 
     @Transactional
-    public CategoryResponseDTO createCategory(CreateCategoryDTO dto) {
+    public CategoryResponseDTO createCategory(CategoryCreateDTO dto) {
         if (categoryRepository.existsByCategoria(dto.getCategoria())) {
             throw new IllegalArgumentException("La categoria con nombre: " + dto.getCategoria() + " ya existe.");
         }
@@ -45,11 +47,11 @@ public class CategoryService {
         categoria.setCategoria(dto.getCategoria());
         categoria.setObjetivo(dto.getObjetivo());
 
-        return mapToDTO(categoryRepository.save(categoria));
+        return CategoryMapper.categoryToDTO(categoryRepository.save(categoria));
     }
 
     @Transactional
-    public CategoryResponseDTO updateCategory(UpdateCategoryDTO cat, Integer id) {
+    public CategoryResponseDTO updateCategory(CategoryUpdateDTO cat, Integer id) {
         Categoria categoria = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Categoria no encontrada. id: " + id));
 
@@ -61,7 +63,7 @@ public class CategoryService {
         }
 
         Categoria updatedCat = categoryRepository.save(categoria);
-        return mapToDTO(updatedCat);
+        return CategoryMapper.categoryToDTO(updatedCat);
     }
 
     @Transactional
@@ -83,12 +85,12 @@ public class CategoryService {
         categoryRepository.delete(cat);
     }
 
-    private CategoryResponseDTO mapToDTO(Categoria cat) {
-        return CategoryResponseDTO.builder()
-                .idCategory(cat.getIdCategoria())
-                .categoria(cat.getCategoria())
-                .objetivo(cat.getObjetivo())
-                .build();
-    }
+    // private CategoryResponseDTO mapToDTO(Categoria cat) {
+    //     return CategoryResponseDTO.builder()
+    //             .idCategory(cat.getIdCategoria())
+    //             .categoria(cat.getCategoria())
+    //             .objetivo(cat.getObjetivo())
+    //             .build();
+    // }
 
 }

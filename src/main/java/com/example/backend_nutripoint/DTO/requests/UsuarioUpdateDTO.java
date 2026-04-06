@@ -1,4 +1,4 @@
-package com.example.backend_nutripoint.DTO;
+package com.example.backend_nutripoint.DTO.requests;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -14,7 +14,7 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UsuarioDTO {
+public class UsuarioUpdateDTO {
 
     @NotBlank
     private String nombres;

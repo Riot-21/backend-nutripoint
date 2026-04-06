@@ -14,12 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-// import com.cloudinary.http5.api.Response;
-import com.example.backend_nutripoint.DTO.CreateProductDTO;
-import com.example.backend_nutripoint.DTO.PriceRangeDTO;
-import com.example.backend_nutripoint.DTO.ProductFilterDTO;
-import com.example.backend_nutripoint.DTO.ProductResponseDTO;
-import com.example.backend_nutripoint.DTO.UpdateProductDTO;
+import com.example.backend_nutripoint.DTO.requests.ProductCreateDTO;
+import com.example.backend_nutripoint.DTO.requests.ProductFilterDTO;
+import com.example.backend_nutripoint.DTO.requests.ProductUpdateDTO;
+import com.example.backend_nutripoint.DTO.responses.PriceRangeDTO;
+import com.example.backend_nutripoint.DTO.responses.ProductResponseDTO;
 import com.example.backend_nutripoint.services.ProductService;
 
 import jakarta.validation.Valid;
@@ -43,7 +42,7 @@ public class ProductController {
     @PostMapping
     // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponseDTO> createProducto(
-            @Valid @ModelAttribute CreateProductDTO dto) throws IOException {
+            @Valid @ModelAttribute ProductCreateDTO dto) throws IOException {
 
         if (dto.getImagenes() != null && dto.getImagenes().size() > 3) {
             throw new IllegalArgumentException("No se pueden subir más de 3 imágenes.");
@@ -56,7 +55,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Integer id, @Valid @ModelAttribute UpdateProductDTO dto) throws IOException{
+    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Integer id, @Valid @ModelAttribute ProductUpdateDTO dto) throws IOException{
         if (dto.getImagenes() != null && dto.getImagenes().size() > 3) {
             throw new IllegalArgumentException("No se pueden subir más de 3 imágenes.");
         }

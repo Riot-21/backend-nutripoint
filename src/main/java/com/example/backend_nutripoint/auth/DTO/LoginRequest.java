@@ -1,4 +1,4 @@
-package com.example.backend_nutripoint.auth;
+package com.example.backend_nutripoint.auth.DTO;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

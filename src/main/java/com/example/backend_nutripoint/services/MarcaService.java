@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.backend_nutripoint.DTO.CreateMarcaDTO;
+import com.example.backend_nutripoint.DTO.requests.MarcaCreateDTO;
 import com.example.backend_nutripoint.exceptions.NotFoundException;
 import com.example.backend_nutripoint.models.Marca;
 import com.example.backend_nutripoint.models.Producto;
@@ -26,8 +26,10 @@ public class MarcaService {
                 .map(Marca::getNombre).toList();
     }
 
+    // ! revisar y cambiar la respuesta para evitar mostrar campo poducto de la
+    // entidad marca
     @Transactional
-    public Marca createBrand(CreateMarcaDTO marca) {
+    public Marca createBrand(MarcaCreateDTO marca) {
         if (marcaRepository.existsByNombre(marca.getMarca())) {
             throw new IllegalArgumentException("La marca con nombre: " + marca.getMarca() + " ya existe.");
         }
@@ -40,6 +42,7 @@ public class MarcaService {
 
     @Transactional
     public void deleteBrand(Long id) {
+        // @SuppressWarnings("null")
         Marca mar = marcaRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Marca no existente"));
 

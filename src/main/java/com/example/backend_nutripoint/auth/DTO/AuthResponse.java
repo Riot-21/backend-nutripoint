@@ -1,6 +1,7 @@
-package com.example.backend_nutripoint.auth;
+package com.example.backend_nutripoint.auth.DTO;
 
-import java.util.List;
+
+import com.example.backend_nutripoint.DTO.responses.UsuarioResponseDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +16,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AuthResponse {
     private String token;
-    private Integer userId;
-    private List<String> roles;
+    private UsuarioResponseDTO user;
 }

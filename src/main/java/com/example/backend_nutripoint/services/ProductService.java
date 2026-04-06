@@ -14,12 +14,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.backend_nutripoint.DTO.CreateProductDTO;
-import com.example.backend_nutripoint.DTO.PriceRangeDTO;
-import com.example.backend_nutripoint.DTO.ProductFilterDTO;
-import com.example.backend_nutripoint.DTO.ProductResponseDTO;
-import com.example.backend_nutripoint.DTO.UpdateProductDTO;
+import com.example.backend_nutripoint.DTO.requests.ProductCreateDTO;
+import com.example.backend_nutripoint.DTO.requests.ProductFilterDTO;
+import com.example.backend_nutripoint.DTO.requests.ProductUpdateDTO;
+import com.example.backend_nutripoint.DTO.responses.PriceRangeDTO;
+import com.example.backend_nutripoint.DTO.responses.ProductResponseDTO;
 import com.example.backend_nutripoint.exceptions.NotFoundException;
+import com.example.backend_nutripoint.mappers.ProductoMapper;
 import com.example.backend_nutripoint.models.Categoria;
 import com.example.backend_nutripoint.models.ImgProd;
 import com.example.backend_nutripoint.models.Marca;
@@ -94,6 +95,13 @@ public class ProductService {
                     .and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("precioUnit"), filterDTO.getPrecioMax()));
         }
 
+        if (filterDTO.getPage() == null) {
+            filterDTO.setPage(0);
+        }
+        if (filterDTO.getSize() == null) {
+            filterDTO.setSize(10);
+        }
+
         // Paginación y orden dinámico
         Sort sort = "desc".equalsIgnoreCase(filterDTO.getDirection())
                 ? Sort.by(filterDTO.getSortBy()).descending()
@@ -107,12 +115,12 @@ public class ProductService {
             throw new NotFoundException("No se encontraron resultados para su búsqueda");
         }
 
-        return productosPage.map(product -> mapToDTO(product, getImageUrlsFromEntity(product)));
+        return productosPage.map(product -> ProductoMapper.productToDTO(product, getImageUrlsFromEntity(product)));
     }
 
     // Metodo para crear un producto
     @Transactional
-    public ProductResponseDTO createProduct(CreateProductDTO dto) throws IOException {
+    public ProductResponseDTO createProduct(ProductCreateDTO dto) throws IOException {
         if (productoRepository.existsByNombre(dto.getNombre())) {
             throw new IllegalArgumentException("El producto con nombre: " + dto.getNombre() + " ya existe.");
         }
@@ -137,11 +145,12 @@ public class ProductService {
             imagenesURL = imgProdService.uploadImage(dto.getImagenes(), savedProduct.getIdProducto());
         }
 
-        return mapToDTO(savedProduct, imagenesURL);
+        return ProductoMapper.productToDTO(savedProduct, imagenesURL);
     }
 
     @Transactional
-    public ProductResponseDTO updateProduct(Integer id, UpdateProductDTO dto) {
+    public ProductResponseDTO updateProduct(Integer id, ProductUpdateDTO dto) {
+        @SuppressWarnings("null")
         Producto prod = productoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Producto no encontrado. ID: " + id));
         if (dto.getNombre() != null)
@@ -172,14 +181,14 @@ public class ProductService {
 
         Producto updatedProduct = productoRepository.save(prod);
         List<String> imagenes = getImageUrlsFromEntity(updatedProduct);
-        return mapToDTO(updatedProduct, imagenes);
+        return ProductoMapper.productToDTO(updatedProduct, imagenes);
     }
 
     @Transactional(readOnly = true)
     public ProductResponseDTO getProductoById(Integer id) {
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Producto no encontrado. ID: " + id));
-        return mapToDTO(producto, getImageUrlsFromEntity(producto));
+        return ProductoMapper.productToDTO(producto, getImageUrlsFromEntity(producto));
     }
 
     @Transactional
@@ -206,21 +215,6 @@ public class ProductService {
         }
 
         return new PriceRangeDTO(min, max);
-    }
-    // Mapper para convertir a formato response
-    private ProductResponseDTO mapToDTO(Producto prod, List<String> imagenesUrls) {
-        return ProductResponseDTO.builder()
-                .idProducto(prod.getIdProducto())
-                .nombre(prod.getNombre())
-                .descripcion(prod.getDescripcion())
-                .stock(prod.getStock())
-                .marca(prod.getMarca().getNombre())
-                .preciounit(prod.getPrecioUnit())
-                .modEmpleo(prod.getModEmpleo())
-                .advert(prod.getAdvert())
-                .imagenesUrls(imagenesUrls)
-                .categorias(prod.getCategorias().stream().map(Categoria::getCategoria).toList())
-                .build();
     }
 
     // Metodo que trae las imagenes segun el producto

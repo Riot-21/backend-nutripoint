@@ -4,7 +4,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.backend_nutripoint.DTO.UsuarioDTO;
+import com.example.backend_nutripoint.DTO.requests.UsuarioUpdateDTO;
+import com.example.backend_nutripoint.DTO.responses.UsuarioResponseDTO;
 import com.example.backend_nutripoint.models.Usuario;
 import com.example.backend_nutripoint.repositories.UsuarioRepository;
 import com.example.backend_nutripoint.services.UsuarioService;
@@ -32,8 +33,8 @@ public class UsuarioController {
     private final UsuarioRepository usuarioRepository;
     
     @GetMapping("/profile")
-    public ResponseEntity<UsuarioDTO> verPerfil(Authentication auth) {
-        UsuarioDTO user = userService.findByEmail(auth.getName());
+    public ResponseEntity<UsuarioResponseDTO> verPerfil(Authentication auth) {
+        UsuarioResponseDTO user = userService.findByEmail(auth.getName());
         return ResponseEntity.ok(user);
     }
 
@@ -44,7 +45,7 @@ public class UsuarioController {
     
 
     @PutMapping("/profile")
-    public ResponseEntity<?> updateProfile(Authentication auth, @Valid @RequestBody UsuarioDTO usuarioDTO, BindingResult result) {
+    public ResponseEntity<?> updateProfile(Authentication auth, @Valid @RequestBody UsuarioUpdateDTO usuarioDTO, BindingResult result) {
         if (result.hasErrors()) {
             return validation(result);
         }
