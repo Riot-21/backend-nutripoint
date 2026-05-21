@@ -1,7 +1,7 @@
 package com.example.backend_nutripoint.models;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -31,8 +31,11 @@ public class Compra {
     @GeneratedValue(strategy = GenerationType.IDENTITY)    
     private Integer idCompra;
 
+    @Column(nullable = false, unique = true)
+    private String codigoCompra;
+
     @Column(nullable = false)
-    private Date fecha = new Date();
+    private LocalDateTime fecha = LocalDateTime.now();
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;

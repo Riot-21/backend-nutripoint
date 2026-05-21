@@ -2,7 +2,7 @@ package com.example.backend_nutripoint.DTO.responses;
 
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.backend_nutripoint.models.EstadoCompra;
@@ -19,8 +19,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CompraResponseDTO {
     private Integer idCompra;
+    private String codigoCompra;
     private Integer idUsuario;
-    private Date fecha;
+    private LocalDateTime fecha;
     private BigDecimal total;
     private TipoPago tipoPago;
     private String direccion;

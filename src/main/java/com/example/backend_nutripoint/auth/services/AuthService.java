@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +19,7 @@ import com.example.backend_nutripoint.auth.DTO.RegisterRequest;
 import com.example.backend_nutripoint.exceptions.NotFoundException;
 import com.example.backend_nutripoint.jwt.JwtService;
 import com.example.backend_nutripoint.mappers.UsuarioMapper;
+import com.example.backend_nutripoint.models.AuthProvider;
 import com.example.backend_nutripoint.models.Role;
 import com.example.backend_nutripoint.models.Usuario;
 import com.example.backend_nutripoint.repositories.UsuarioRepository;
@@ -39,7 +41,7 @@ public class AuthService {
         Usuario user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        if (user.getPassword() == null) {
+        if (user.getProvider() == AuthProvider.GOOGLE) {
             throw new IllegalArgumentException("Esta cuenta usa login con Google");
         }
 
@@ -52,9 +54,9 @@ public class AuthService {
     }
 
     @Transactional
-    public AuthResponse register(RegisterRequest request, List<Role> requestedRoles) {
+    public AuthResponse register(RegisterRequest request, Role registerType) {
         validateUniqueUser(request);
-        List<Role> roles = sanitizeRoles(requestedRoles);
+        List<Role> roles = sanitizeRoles(registerType);
 
         Usuario user = buildNewUser(request, roles);
         userRepository.save(user);
@@ -77,23 +79,20 @@ public class AuthService {
                 .build();
     }
 
-    private List<Role> sanitizeRoles(List<Role> requestedRoles) {
-        if (requestedRoles == null || requestedRoles.isEmpty()) {
-            return List.of(Role.USER);
-        }
-
+    private List<Role> sanitizeRoles(Role registerType) {
         Set<Role> validRoles = new HashSet<>();
-        for (Role role : requestedRoles) {
-            if (role == Role.USER || role == Role.ADMIN || role == Role.SUPER_ADMIN) {
-                validRoles.add(role);
-            } else {
-                throw new IllegalArgumentException("Rol inválido: " + role);
+            if(registerType == Role.USER){
+                validRoles.add(Role.USER);
             }
-        }
-        if (validRoles.contains(Role.SUPER_ADMIN)) {
-            validRoles.add(Role.ADMIN);
-        }
-        validRoles.add(Role.USER);
+            if(registerType == Role.ADMIN){
+                validRoles.add(Role.ADMIN);
+                validRoles.add(Role.USER);
+            }
+            if(registerType == Role.SUPER_ADMIN){
+                validRoles.add(Role.SUPER_ADMIN);
+                validRoles.add(Role.ADMIN);
+                validRoles.add(Role.USER);
+            }
 
         return List.copyOf(validRoles);
     }
@@ -117,6 +116,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEstado(true);
         user.setRoles(roles);
+        user.setProvider(AuthProvider.LOCAL);
         return user;
     }
 
@@ -149,9 +149,10 @@ public class AuthService {
             user.setEmail(email);
             user.setDni(null);
             user.setTelefono(null);
-            user.setPassword(null);
+            user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
             user.setEstado(true);
             user.setRoles(List.of(Role.USER));
+            user.setProvider(AuthProvider.GOOGLE);
 
             userRepository.save(user);
 
@@ -169,7 +170,7 @@ public class AuthService {
         Usuario user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
-        if (user.getPassword() == null) {
+        if (user.getProvider() == AuthProvider.GOOGLE) {
             throw new IllegalArgumentException("Esta cuenta usa login con Google");
         }
 
@@ -186,10 +187,8 @@ public class AuthService {
         user.setRecoveryCodeExpiration(LocalDateTime.now().plusMinutes(5));
         userRepository.save(user);
 
-        emailService.sendSimpleMessage(
-                email,
-                "Código de recuperación de contraseña - Nutripoint",
-                "Tu código de recuperación es: " + code + "\nEste código expira en 15 minutos.");
+        emailService.sendCodeRecoveryPassword(email, code);
+
     }
 
     @Transactional

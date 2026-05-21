@@ -12,6 +12,7 @@ public class CompraMapper {
         return CompraResponseDTO.builder()
                         .idCompra(compra.getIdCompra())
                         .idUsuario(compra.getUsuario().getIdUsuario())
+                        .codigoCompra(compra.getCodigoCompra())
                         .fecha(compra.getFecha())
                         .total(compra.getTotal())
                         .tipoPago(compra.getTipoPago())

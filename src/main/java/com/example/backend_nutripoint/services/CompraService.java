@@ -1,9 +1,10 @@
 package com.example.backend_nutripoint.services;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.backend_nutripoint.DTO.requests.CompraRequestDTO;
 import com.example.backend_nutripoint.DTO.requests.DetalleCompraRequestDTO;
 import com.example.backend_nutripoint.DTO.responses.CompraResponseDTO;
+import com.example.backend_nutripoint.auth.services.EmailService;
 import com.example.backend_nutripoint.exceptions.NotFoundException;
 import com.example.backend_nutripoint.mappers.CompraMapper;
 import com.example.backend_nutripoint.models.Compra;
@@ -30,6 +32,7 @@ public class CompraService {
         private final CompraRepository compraRepository;
         private final UsuarioRepository usuarioRepository;
         private final ProductoRepository productoRepository;
+        private final EmailService emailService;
 
         @Transactional
         public CompraResponseDTO realizarCompra(CompraRequestDTO dto, String emailUser) {
@@ -38,7 +41,8 @@ public class CompraService {
 
                 Compra compra = new Compra();
                 compra.setUsuario(usuario);
-                compra.setFecha(new Date());
+                compra.setCodigoCompra(generateCode());
+                compra.setFecha(LocalDateTime.now());
                 compra.setDireccion(dto.getDireccion());
                 compra.setDistrito(dto.getDistrito());
                 compra.setEstado(EstadoCompra.PAGADO);
@@ -78,8 +82,18 @@ public class CompraService {
 
                 // tipo cascade guarda detalle automaticamente
                 Compra savedCompra = compraRepository.save(compra);
+                emailService.enviarEmailCompra(savedCompra);
 
                 return CompraMapper.compraToDTO(savedCompra);
+        }
+
+        private String generateCode() {
+            String random = UUID.randomUUID()
+                    .toString()
+                    .substring(0, 8)
+                    .toUpperCase();
+
+            return "COMP-" + random;
         }
 
         // private CompraResponseDTO mapToDTO(Compra compra) {

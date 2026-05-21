@@ -49,8 +49,8 @@ public class ProductService {
         // Filtro por nombre o descripción
         if (filterDTO.getQuery() != null && !filterDTO.getQuery().isBlank()) {
             spec = spec.and((root, query, cb) -> cb.or(
-                    cb.like(cb.lower(root.get("nombre")), "%" + filterDTO.getQuery().toLowerCase() + "%"),
-                    cb.like(cb.lower(root.get("descripcion")), "%" + filterDTO.getQuery().toLowerCase() + "%")));
+                    cb.like(cb.lower(root.get("nombre")), "%" + filterDTO.getQuery().toLowerCase() + "%")));
+                    // cb.like(cb.lower(root.get("descripcion")), "%" + filterDTO.getQuery().toLowerCase() + "%")));
         }
 
         // Filtro por marca
@@ -241,7 +241,7 @@ public class ProductService {
 
     private Marca validateMarca(String marca) {
         Marca m = marcaRepository.findByNombre(marca)
-                .orElseThrow(() -> new IllegalArgumentException("La marca noexiste"));
+                .orElseThrow(() -> new IllegalArgumentException("La marca no existe"));
 
         return m;
     }

@@ -86,9 +86,11 @@ public class SecurityConfig {
                                 // "/auth/register-admin",
                                 "/auth/register",
                                 "/imagenes/**",
-                                "/productos/**")
+                                "/productos/**",
+                                "/seed/**",
+                                "/ai/**")
                         .permitAll()
-                        .requestMatchers("/auth/otro", "/auth/register-admin").hasRole("ADMIN")
+                        .requestMatchers("/auth/otro", "/auth/register-admin").hasAnyRole("ADMIN", "SUPER_ADMIN")
                         .requestMatchers("/productos/otro").hasRole("USER")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

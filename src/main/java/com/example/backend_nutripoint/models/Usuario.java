@@ -42,7 +42,7 @@ public class Usuario {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String password;
 
     //! AQUI HAY UN ATRIBUTO UPDATABLE--REVISAR LUEGO PARA VER EN QUE OTROS CASOS USARLA
@@ -69,5 +69,9 @@ public class Usuario {
     @CollectionTable(name = "usuario_roles", joinColumns = @JoinColumn(name = "usuario_id"))
     @Enumerated(EnumType.STRING)
     private List<Role> roles;
+
+    @Column(nullable = false)  
+    @Enumerated(EnumType.STRING)  
+    private AuthProvider provider;
 
 }

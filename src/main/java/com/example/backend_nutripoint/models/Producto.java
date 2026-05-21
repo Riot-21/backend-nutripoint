@@ -16,7 +16,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,7 +25,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+// @AllArgsConstructor
 public class Producto {
     //!DIFERENCIA ENTRE INTGER E INT: INTEGER ES MEJOR PARA ID PORQUE ES NECESARIO QUE PERMITA NULL ANTES DE SER CREADO EN BD
     //!INT DEFINE SIEMPRE CON 0, POR LO QUE SIEMPRE OBLIGA A QUE HAYA UN VALOR

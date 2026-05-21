@@ -1,7 +1,5 @@
 package com.example.backend_nutripoint.auth.controller;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -52,24 +50,23 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> registerUser(@Valid @RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authService.register(request, List.of(Role.USER)));
+        return ResponseEntity.ok(authService.register(request, Role.USER));
     }
 
     @PostMapping("/refresh-token")
-    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AuthResponse> refresgToken(Authentication auth) {
-        // System.out.println("HOLAAAAA"+auth.getPrincipal());
         return ResponseEntity.ok(authService.refreshToken(auth.getName()));
     }
     
 
     @PostMapping("/register-admin")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public ResponseEntity<?> registerAdmin(@Valid @RequestBody RegisterRequest request) {
-        if(request.getRoles().contains(Role.USER) && !request.getRoles().contains(Role.SUPER_ADMIN)){
-            return ResponseEntity.ok(authService.register(request, List.of(Role.ADMIN)));
+    public ResponseEntity<AuthResponse> registerAdmin(@Valid @RequestBody RegisterRequest request) {
+        Role type = Role.ADMIN;
+        if(request.getSuperAdmin() != null && request.getSuperAdmin()) {
+            type = Role.SUPER_ADMIN;
         }
-        return ResponseEntity.ok(authService.register(request, request.getRoles()));
+
+        return ResponseEntity.ok(authService.register(request, type));
     }
 
     @PostMapping("/google-login")

@@ -1,13 +1,7 @@
 package com.example.backend_nutripoint.auth.DTO;
 
-import java.util.List;
-
-import com.example.backend_nutripoint.models.Role;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-// import jakarta.validation.constraints.NotEmpty;
-// import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -43,8 +37,7 @@ public class RegisterRequest {
     @Pattern(regexp = "\\d+", message = "El DNI solo debe contener números")
     private String telefono;
 
-    // @NotNull(message = "Debe especificar al menos un rol")
-    // @NotEmpty(message = "La lista de roles no puede estar vacía")
-    private List<Role> roles;
+    private Boolean superAdmin = false;
+
 
 }
