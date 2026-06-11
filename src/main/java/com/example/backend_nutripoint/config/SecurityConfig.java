@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -76,22 +77,38 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/login",
+                                "/auth/register",
                                 "/auth/google-login",
                                 "/auth/google-register",
                                 "/auth/recover-password",
                                 "/auth/reset-password",
-                                "/category/**",
-                                "/marca/**",
-                                // "/auth/login-admin",
-                                // "/auth/register-admin",
-                                "/auth/register",
-                                "/imagenes/**",
-                                "/productos/**",
                                 "/seed/**",
                                 "/ai/**")
                         .permitAll()
-                        .requestMatchers("/auth/otro", "/auth/register-admin").hasAnyRole("ADMIN", "SUPER_ADMIN")
-                        .requestMatchers("/productos/otro").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET,
+                                "/marca/**",
+                                "/category/**",
+                                "/productos/**",
+                                "/imagenes/**")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/productos/**",
+                                "/marca/**",
+                                "/category/**",
+                                "/imagenes/**")
+                        .hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/productos/**",
+                                "/marca/**",
+                                "/category/**",
+                                "/imagenes/**")
+                        .hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/productos/**",
+                                "/marca/**",
+                                "/category/**",
+                                "/imagenes/**")
+                        .hasAnyRole("ADMIN", "SUPER_ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex

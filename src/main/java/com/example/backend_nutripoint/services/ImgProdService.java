@@ -12,8 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.example.backend_nutripoint.DTO.responses.ImageResponseDTO;
 import com.example.backend_nutripoint.exceptions.ImageUploadException;
 import com.example.backend_nutripoint.exceptions.NotFoundException;
+import com.example.backend_nutripoint.mappers.ImageMapper;
 import com.example.backend_nutripoint.models.ImgProd;
 import com.example.backend_nutripoint.models.Producto;
 import com.example.backend_nutripoint.repositories.ImgProdRepository;
@@ -35,7 +37,7 @@ public class ImgProdService {
     private static final long MAX_SIZE_IN_BYTES = 2 * 1024 * 1024;
 
     @Transactional
-    public List<String> uploadImage(List<MultipartFile> files, Integer productoId) {
+    public List<ImageResponseDTO> uploadImage(List<MultipartFile> files, Integer productoId) {
         // @SuppressWarnings("null")
         Producto producto = productoRepository.findById(productoId)
                 .orElseThrow(() -> new NotFoundException("Producto no encontrado"));
@@ -83,7 +85,7 @@ public class ImgProdService {
         }
 
         imgProdRepository.saveAll(imagenes);
-        return imagenes.stream().map(ImgProd::getImageUrl).toList();
+        return imagenes.stream().map(ImageMapper::imageToDTO).toList();
     }
 
     public List<String> getImagesByProductId(Integer idProducto) {

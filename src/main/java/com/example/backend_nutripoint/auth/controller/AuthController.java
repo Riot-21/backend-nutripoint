@@ -38,7 +38,6 @@ public class AuthController {
     }
 
     @GetMapping("/hola")
-    @PreAuthorize("hasRole('ADMIN')")
     public String hola2() {
         return "hola";
     }
@@ -60,6 +59,7 @@ public class AuthController {
     
 
     @PostMapping("/register-admin")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<AuthResponse> registerAdmin(@Valid @RequestBody RegisterRequest request) {
         Role type = Role.ADMIN;
         if(request.getSuperAdmin() != null && request.getSuperAdmin()) {

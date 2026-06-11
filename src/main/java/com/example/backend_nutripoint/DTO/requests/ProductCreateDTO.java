@@ -36,7 +36,6 @@ public class ProductCreateDTO {
     @NotNull(message = "El precio es obligatorio")
     @DecimalMin(value = "0.01", message = "El precio debe ser mayor a 0")
     @Digits(integer = 8, fraction = 2, message = "El precio debe tener como máximo 8 dígitos enteros y 2 decimales")
-    // private Double precioUnit;
     private BigDecimal precioUnit;
 
     @NotBlank(message = "El modo de empleo es obligatorio")

@@ -18,13 +18,12 @@ import com.example.backend_nutripoint.DTO.requests.ProductCreateDTO;
 import com.example.backend_nutripoint.DTO.requests.ProductFilterDTO;
 import com.example.backend_nutripoint.DTO.requests.ProductUpdateDTO;
 import com.example.backend_nutripoint.DTO.responses.PriceRangeDTO;
+import com.example.backend_nutripoint.DTO.responses.ProductDetailResponseDTO;
 import com.example.backend_nutripoint.DTO.responses.ProductResponseDTO;
 import com.example.backend_nutripoint.services.ProductService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-
 
 @RestController
 @RequestMapping("/productos")
@@ -55,7 +54,8 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Integer id, @Valid @ModelAttribute ProductUpdateDTO dto) throws IOException{
+    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Integer id,
+            @Valid @ModelAttribute ProductUpdateDTO dto) throws IOException {
         if (dto.getImagenes() != null && dto.getImagenes().size() > 3) {
             throw new IllegalArgumentException("No se pueden subir más de 3 imágenes.");
         }
@@ -71,9 +71,14 @@ public class ProductController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<ProductDetailResponseDTO> getProductoById(@PathVariable Integer id) {
+        return ResponseEntity.ok(productService.getProductoByIdShop(id));
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> getProductoById(@PathVariable Integer id) {
-        return ResponseEntity.ok(productService.getProductoById(id));
+    public ResponseEntity<ProductResponseDTO> getProductoByIdCrud(@PathVariable Integer id) {
+        return ResponseEntity.ok(productService.getProductoByIdCrud(id));
     }
 
     @DeleteMapping("/{id}")
@@ -86,6 +91,5 @@ public class ProductController {
     public ResponseEntity<PriceRangeDTO> getPriceRange() {
         return ResponseEntity.ok(productService.getPriceRange());
     }
-    
 
 }

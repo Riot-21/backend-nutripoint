@@ -17,9 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.backend_nutripoint.DTO.requests.ProductCreateDTO;
 import com.example.backend_nutripoint.DTO.requests.ProductFilterDTO;
 import com.example.backend_nutripoint.DTO.requests.ProductUpdateDTO;
+import com.example.backend_nutripoint.DTO.responses.ImageResponseDTO;
 import com.example.backend_nutripoint.DTO.responses.PriceRangeDTO;
+import com.example.backend_nutripoint.DTO.responses.ProductDetailResponseDTO;
 import com.example.backend_nutripoint.DTO.responses.ProductResponseDTO;
 import com.example.backend_nutripoint.exceptions.NotFoundException;
+import com.example.backend_nutripoint.mappers.ImageMapper;
 import com.example.backend_nutripoint.mappers.ProductoMapper;
 import com.example.backend_nutripoint.models.Categoria;
 import com.example.backend_nutripoint.models.ImgProd;
@@ -46,11 +49,10 @@ public class ProductService {
     public Page<ProductResponseDTO> searchProducts(ProductFilterDTO filterDTO) {
         Specification<Producto> spec = Specification.unrestricted();
 
-        // Filtro por nombre o descripción
+        // Filtro por nombre
         if (filterDTO.getQuery() != null && !filterDTO.getQuery().isBlank()) {
             spec = spec.and((root, query, cb) -> cb.or(
                     cb.like(cb.lower(root.get("nombre")), "%" + filterDTO.getQuery().toLowerCase() + "%")));
-                    // cb.like(cb.lower(root.get("descripcion")), "%" + filterDTO.getQuery().toLowerCase() + "%")));
         }
 
         // Filtro por marca
@@ -115,7 +117,7 @@ public class ProductService {
             throw new NotFoundException("No se encontraron resultados para su búsqueda");
         }
 
-        return productosPage.map(product -> ProductoMapper.productToDTO(product, getImageUrlsFromEntity(product)));
+        return productosPage.map(product -> ProductoMapper.productToDTO(product, getImagesFromEntity(product)));
     }
 
     // Metodo para crear un producto
@@ -139,7 +141,7 @@ public class ProductService {
         prod.setMarca(marca);
 
         Producto savedProduct = productoRepository.save(prod);
-        List<String> imagenesURL = new ArrayList<>();
+        List<ImageResponseDTO> imagenesURL = new ArrayList<>();
 
         if (dto.getImagenes() != null && !dto.getImagenes().isEmpty()) {
             imagenesURL = imgProdService.uploadImage(dto.getImagenes(), savedProduct.getIdProducto());
@@ -150,7 +152,6 @@ public class ProductService {
 
     @Transactional
     public ProductResponseDTO updateProduct(Integer id, ProductUpdateDTO dto) {
-        @SuppressWarnings("null")
         Producto prod = productoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Producto no encontrado. ID: " + id));
         if (dto.getNombre() != null)
@@ -180,15 +181,43 @@ public class ProductService {
         }
 
         Producto updatedProduct = productoRepository.save(prod);
-        List<String> imagenes = getImageUrlsFromEntity(updatedProduct);
+        List<ImageResponseDTO> imagenes = getImagesFromEntity(updatedProduct);
         return ProductoMapper.productToDTO(updatedProduct, imagenes);
     }
 
     @Transactional(readOnly = true)
-    public ProductResponseDTO getProductoById(Integer id) {
+    public ProductResponseDTO getProductoByIdCrud(Integer id) {
         Producto producto = productoRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Producto no encontrado. ID: " + id));
-        return ProductoMapper.productToDTO(producto, getImageUrlsFromEntity(producto));
+                .orElseThrow(() -> new NotFoundException("Producto no encontrado. ID: " +
+                        id));
+        return ProductoMapper.productToDTO(producto,
+                getImagesFromEntity(producto));
+    }
+
+    @Transactional(readOnly = true)
+    public ProductDetailResponseDTO getProductoByIdShop(Integer id) {
+
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(
+                        "Producto no encontrado. ID: " + id));
+
+        ProductResponseDTO productDTO = ProductoMapper.productToDTO(
+                producto,
+                getImagesFromEntity(producto));
+
+        List<Integer> categoriasIds = producto.getCategorias()
+                .stream()
+                .map(Categoria::getIdCategoria)
+                .toList();
+
+        List<Producto> relatedProducts = productoRepository.findRelatedProducts(
+                categoriasIds,
+                producto.getIdProducto(),
+                PageRequest.of(0, 5));
+
+        return ProductoMapper.productDetailToDTO(
+                productDTO,
+                ProductoMapper.productCardToDTO(relatedProducts));
     }
 
     @Transactional
@@ -206,11 +235,11 @@ public class ProductService {
     }
 
     @Transactional
-    public PriceRangeDTO getPriceRange(){
+    public PriceRangeDTO getPriceRange() {
         Double min = productoRepository.findMinPrice();
         Double max = productoRepository.findMaxPrice();
 
-        if(min==null || max==null){
+        if (min == null || max == null) {
             return new PriceRangeDTO(0.0, 0.0);
         }
 
@@ -218,12 +247,12 @@ public class ProductService {
     }
 
     // Metodo que trae las imagenes segun el producto
-    private List<String> getImageUrlsFromEntity(Producto product) {
+    private List<ImageResponseDTO> getImagesFromEntity(Producto product) {
         if (product.getImagenes() == null || product.getImagenes().isEmpty()) {
             return List.of();
         }
         return product.getImagenes().stream()
-                .map(ImgProd::getImageUrl)
+                .map(ImageMapper::imageToDTO)
                 .toList();
     }
 

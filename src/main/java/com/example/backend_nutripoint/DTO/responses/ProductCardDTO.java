@@ -12,16 +12,14 @@ import lombok.Setter;
 @Setter
 @Builder
 @AllArgsConstructor
-public class ProductResponseDTO {
+public class ProductCardDTO {
+
     private Integer idProducto;
+
     private String nombre;
-    private String descripcion;
-    private Integer stock;
-    private String marca;
-    private BigDecimal preciounit;
-    private String modEmpleo;
-    private String advert;
+
+    private BigDecimal precio;
     private List<String> categorias;
-    private List<ImageResponseDTO> imagenes;
-    // private List<String> imagenesUrls;
+
+    private String imagenUrl;
 }
